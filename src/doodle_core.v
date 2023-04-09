@@ -22,7 +22,12 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Dow
     always @ (posedge Clk, posedge reset)
     begin
         if (Reset)
-            state <= I;
+            begin
+                state <= I;
+                i_count <= 8'bx;
+                J <= 8'bx;
+                Curr <= 8'bx;
+            end
         else
         begin
             case(state)
