@@ -102,7 +102,7 @@ module vga_top(
 	assign SSD3 = 4'b0000;
 	assign SSD2 = 4'b0000;
 	assign SSD1 = (q_Done) ? i_score[7:4] : 4'b0000;
-	assign SSD0 = (q_DONE) ? i_score[3:0] : 4'b0000;
+	assign SSD0 = (q_Done) ? i_score[3:0] : 4'b0000;
 
 	assign ssdscan_clk = DIV_CLK[19:18];
 
