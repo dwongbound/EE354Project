@@ -24,7 +24,7 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Dow
         if (Reset)
             begin
                 state <= I;
-                i_count <= 8'bx;
+                i_score <= 8'bx;
                 J <= 8'bx;
                 Curr <= 8'bx;
             end
@@ -53,9 +53,20 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Dow
                 DOWN:
                     begin 
                         // Add state transitions here
-
-                        // Datapath Operations
-                        Curr <= Curr - 1;
+                        if (/* hit block */)
+                            begin
+                            state <= UP;
+                            Curr <= 0;
+                            end
+                        else
+                        begin
+                            if (/* reached bottom of screen */)
+                                state <= DONE;
+                            else 
+                            begin
+                                Curr <= Curr - 1;
+                            end
+                        end
                     end
                 
                 DONE:
@@ -68,7 +79,6 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Dow
                         state <= UNK;
             endcase
         end
-
 
     end
 

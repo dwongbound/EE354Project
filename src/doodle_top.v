@@ -56,6 +56,33 @@ module vga_top(
 	assign vgaG = rgb[7  : 4];
 	assign vgaB = rgb[3  : 0];
 	
+	// Local Signals
+	
+	wire Start_Ack_Pulse;
+	wire board_clk, sys_clk;
+	reg [26:0]	    DIV_CLK;
+	wire q_I, q_Sub, q_Mult, q_Done;
+	wire [7:0] J, Curr, i_score;
+	reg [7:0] Jin;
+
+	assign board_clk = ClkPort;
+	
+	assign Reset = BtnC;
+
+	always @(posedge board_clk, posedge reset) 	
+    begin							
+        if (reset)
+		DIV_CLK <= 0;
+        else
+		DIV_CLK <= DIV_CLK + 1'b1;
+    end
+
+	assign	sys_clk = DIV_CLK[25];
+
+
+	// the state module
+	doodle_core doodle_sm(.Clk(sys_clk), .Reset(Reset), .Start(Start_Ack_Pulse), .Ack(Start_Ack_Pulse), .Jin(Jin), .J(J), 
+						  .Curr(Curr), .i_score(i_score), .q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done));
 	// disable mamory ports
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
 
