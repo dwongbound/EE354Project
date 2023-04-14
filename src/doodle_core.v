@@ -2,16 +2,16 @@
 
 `timescale 1ns / 1ps
 
-module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Down, q_Done);
+module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_Up, q_Down, q_Done);
 
     input   Clk, Reset, Start, Ack;
-    input [7:0] Jin; // Assuming would get jump distance (that's constant) from top design 
+    input [7:0] Jin, Min; // Assuming would get jump distance (that's constant) from top design 
     output q_I, q_Up, q_Down, q_Done;
     /*
         Curr represents the current distance that the doodle has jumped.
         i_score represents the current score.
     */
-    output reg[7:0] J, Curr, i_score; 
+    output reg[7:0] J, Curr, i_score, M; 
 
     reg [3:0] state;
     assign {q_Done, q_Down, q_Up, q_I} = state;
@@ -27,6 +27,7 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Dow
                 i_score <= 8'bx;
                 J <= 8'bx;
                 Curr <= 8'bx;
+                M <= 8'bx;
             end
         else
         begin
@@ -36,6 +37,7 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Dow
                         if (Start)
                             state <= UP;
                         J <= Jin;
+                        M <= Min;
                         Curr <= 0;
                         i_score <= 0;
                     end
@@ -48,6 +50,8 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Curr, i_score, q_I, q_Up, q_Dow
                             Curr <= Curr + 1;
                             i_score <= i_score + 1;
                         end
+                        if (/* Above the middle */) 
+                            /* Scroll the screen up */
                     end
                 
                 DOWN:

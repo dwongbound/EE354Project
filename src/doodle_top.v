@@ -30,6 +30,7 @@ module vga_top(
 	output hSync, vSync,
 	output [3:0] vgaR, vgaG, vgaB,
 	
+	output 	 Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0,
 	//SSG signal 
 	output An0, An1, An2, An3, An4, An5, An6, An7,
 	output Ca, Cb, Cc, Cd, Ce, Cf, Cg, Dp,
@@ -62,12 +63,24 @@ module vga_top(
 	wire board_clk, sys_clk;
 	reg [26:0]	    DIV_CLK;
 	wire q_I, q_Sub, q_Mult, q_Done;
-	wire [7:0] J, Curr, i_score;
-	reg [7:0] Jin;
+	wire [7:0] J, M, Curr, i_score;
+	wire [1:0] ssdscan_clk;
+	reg [7:0] Jin, Min;
 
 	assign board_clk = ClkPort;
+
+	assign ssdscan_clk = DIV_CLK[19:18];
+
+	assign AN0	= ~(~(ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 00
+	assign AN1	= ~(~(ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 01
+	assign AN2	= ~( (ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 10
+	assign AN3	= ~( (ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 11
+
+	assign {AN7, AN6, AN5, AN4} = 4'b1111;
+	/* Hard code Jin and Min */
 	
 	assign Reset = BtnC;
+	assign Start_Ack_Pulse = BtnL;
 
 	always @(posedge board_clk, posedge reset) 	
     begin							
@@ -82,7 +95,16 @@ module vga_top(
 
 	// the state module
 	doodle_core doodle_sm(.Clk(sys_clk), .Reset(Reset), .Start(Start_Ack_Pulse), .Ack(Start_Ack_Pulse), .Jin(Jin), .J(J), 
-						  .Curr(Curr), .i_score(i_score), .q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done));
+						  .Min(Min), .M(M), .Curr(Curr), .i_score(i_score), .q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done));
+
+	/* Use SSDs to print score when arriving in DONE state */
+
+
+	/* Use LEDs to see which state we're in */
+	assign {Ld7, Ld6, Ld5, Ld4} = {q_I, q_Up, q_Down, q_Done};
+
+
+
 	// disable mamory ports
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
 
