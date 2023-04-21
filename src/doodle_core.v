@@ -19,6 +19,43 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
     localparam 	
 	I = 4'b0001, UP = 4'b0010, DOWN = 4'b0100, DONE = 4'b1000, UNK = 4'bXXXX;
 
+    // Obtain the resolution of the screen using the VGA interface module
+    parameter H_RES = 640;
+    parameter V_RES = 480;
+
+    // Calculate the midpoint of the screen
+    parameter H_MIDDLE = H_RES / 2;
+    parameter V_MIDDLE = V_RES / 2;
+
+    parameter BLACK = 12'b0000_0000_0000;
+	parameter WHITE = 12'b1111_1111_1111;
+	parameter RED   = 12'b1111_0000_0000;
+	parameter GREEN = 12'b0000_1111_0000;
+
+    /*
+        pixel_x and pixel_y represent the current pixel being displayed on the screen.
+
+        object_x and object_y represent the position of the object being checked
+    */
+    input [7:0] pixel_x; 
+    input [7:0] pixel_y;
+    input object_x;
+    input object_y;
+    output reg is_in_middle;
+
+    input bright;
+    reg [10:0] v_counter;
+    reg [10:0] h_counter;
+
+    
+    /*
+        The two wires represent blocks. Can add more as needed.
+    */
+    output reg [11:0] rgb
+    wire B1; 
+    wire B2; 
+
+
     always @ (posedge Clk, posedge reset)
     begin
         if (Reset)
@@ -50,13 +87,19 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
                             Curr <= Curr + 1;
                             i_score <= i_score + 1;
                         end
-                        if (/* Above the middle */) 
-                            /* Scroll the screen up */
+                        if (pixel_x >= object_x - 10 && pixel_x <= object_x + 10 &&
+                            pixel_y >= object_y - 10 && pixel_y <= object_y + 10) 
+                            begin
+                            is_in_middle <= 1;
+                            end
+                        else 
+                            begin
+                            is_in_middle <= 0;
+                            end
                     end
                 
                 DOWN:
                     begin 
-                        // Add state transitions here
                         if (/* hit block */)
                             begin
                             state <= UP;
@@ -85,5 +128,32 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
         end
 
     end
+
+
+    // Might need to put 
+
+    always @ (posedge Clk)
+    begin
+        if (is_in_middle==1'b1) 
+        begin
+            if (vCounter<=250)
+            begin
+                vCounter <= vCounter + 1;
+            end
+        end
+        else
+            is_in_middle==1'b0;
+    end
+
+    always@ (*) // paint a white box on a red background
+    	if (~bright)
+		rgb = BLACK; // force black if not bright
+	 else if (B1 == 1 || B2==1)
+		rgb = GREEN;
+	 else
+		rgb = RED; // background color
+
+    assign B1 = (hCount>= 600 && hCount <= 620) && (vCount>=(v_counter+300) && vCount<=(v_counter+330));
+    assign B2 = (hCount>=300 && hCount <= 340) && (vCount>=(v_counter+200) && vCount<=(v_counter+230))
 
 endmodule;
