@@ -2,7 +2,8 @@
 
 `timescale 1ns / 1ps
 
-module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_Up, q_Down, q_Done);
+module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_Up, q_Down, q_Done,
+                 bright, hCount, vCount, rgb, pixel_x, pixel_y, object_x, object_y, is_in_middle);
 
     input   Clk, Reset, Start, Ack;
     input [7:0] Jin, Min; // Assuming would get jump distance (that's constant) from top design 
@@ -44,6 +45,8 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
     output reg is_in_middle;
 
     input bright;
+    input [9:0] hCount;
+    input [9:0] vCount;
     reg [10:0] v_counter;
     reg [10:0] h_counter;
 
@@ -51,12 +54,12 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
     /*
         The two wires represent blocks. Can add more as needed.
     */
-    output reg [11:0] rgb
+    output reg [11:0] rgb;
     wire B1; 
     wire B2; 
 
 
-    always @ (posedge Clk, posedge reset)
+    always @ (posedge Clk, posedge Reset)
     begin
         if (Reset)
             begin
@@ -100,14 +103,14 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
                 
                 DOWN:
                     begin 
-                        if (/* hit block */)
+                        if ((object_x==300 && object_y==230)) // Dummy code, will add condition later /* hit block */
                             begin
                             state <= UP;
                             Curr <= 0;
                             end
                         else
                         begin
-                            if (/* reached bottom of screen */)
+                            if (1) // Dummy code, will add condition later /* reached bottom of screen */
                                 state <= DONE;
                             else 
                             begin
@@ -136,13 +139,13 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
     begin
         if (is_in_middle==1'b1) 
         begin
-            if (vCounter<=250)
+            if (v_counter<=250)
             begin
-                vCounter <= vCounter + 1;
+                v_counter <= v_counter + 1;
             end
         end
         else
-            is_in_middle==1'b0;
+            is_in_middle<=1'b0;
     end
 
     always@ (*) // paint a white box on a red background
@@ -154,6 +157,6 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
 		rgb = RED; // background color
 
     assign B1 = (hCount>= 600 && hCount <= 620) && (vCount>=(v_counter+300) && vCount<=(v_counter+330));
-    assign B2 = (hCount>=300 && hCount <= 340) && (vCount>=(v_counter+200) && vCount<=(v_counter+230))
+    assign B2 = (hCount>=300 && hCount <= 340) && (vCount>=(v_counter+200) && vCount<=(v_counter+230));
 
-endmodule;
+endmodule

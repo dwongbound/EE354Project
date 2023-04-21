@@ -40,13 +40,16 @@ module vga_top(
 	
 	wire bright;
 	wire[9:0] hc, vc;
+	wire [7:0] pixel_x, pixel_y;
+	wire object_x, object_y;
+	wire is_in_middle;
 	wire[15:0] score;
 	wire [6:0] ssdOut;
 	wire [3:0] anode;
 	wire [11:0] rgb;
 	display_controller dc(.clk(ClkPort), .hSync(hSync), .vSync(vSync), .bright(bright), .hCount(hc), .vCount(vc));
-	vga_bitchange vbc(.clk(ClkPort), .bright(bright), .button(BtnU), .hCount(hc), .vCount(vc), .rgb(rgb), .score(score));
-	counter cnt(.clk(ClkPort), .displayNumber(score), .anode(anode), .ssdOut(ssdOut));
+	//vga_bitchange vbc(.clk(ClkPort), .bright(bright), .button(BtnU), .hCount(hc), .vCount(vc), .rgb(rgb), .score(score));
+	//counter cnt(.clk(ClkPort), .displayNumber(score), .anode(anode), .ssdOut(ssdOut));
 	
 	//assign Dp = 1;
 	//assign {Ca, Cb, Cc, Cd, Ce, Cf, Cg} = ssdOut[6 : 0];
@@ -80,9 +83,9 @@ module vga_top(
 
 	/* Hard code Jin and Min */
 
-	always @(posedge board_clk, posedge reset) 	
+	always @(posedge board_clk, posedge Reset) 	
     begin							
-        if (reset)
+        if (Reset)
 		DIV_CLK <= 0;
         else
 		DIV_CLK <= DIV_CLK + 1'b1;
@@ -92,12 +95,14 @@ module vga_top(
 
 
 	// the state module
-	doodle_core doodle_sm(.Clk(sys_clk), .Reset(Reset), .Start(Start_Ack_Pulse), .Ack(Start_Ack_Pulse), .Jin(Jin), .J(J), 
-						  .Min(Min), .M(M), .Curr(Curr), .i_score(i_score), .q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done));
+	doodle_sm doodle_sm(.Clk(sys_clk), .Reset(Reset), .Start(Start_Ack_Pulse), .Ack(Start_Ack_Pulse), .Jin(Jin), .J(J), 
+						  .Min(Min), .M(M), .Curr(Curr), .i_score(i_score), .q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
+						  .bright(bright), .hCount(hc), .vCount(vc), .rgb(rgb), .pixel_x(pixel_x), .pixel_y(pixel_y), .object_x(object_x),
+						  .object_y(object_y), .is_in_middle(is_in_middle) );
 
 
 	/* Use LEDs to see which state we're in */
-	assign {Ld7, Ld6, Ld5, Ld4} = {q_I, q_Up, q_Down, q_Done};
+	assign {Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0} = {q_I, q_Up, q_Down, q_Done, 4'b1111};
 
 	assign SSD3 = 4'b0000;
 	assign SSD2 = 4'b0000;
