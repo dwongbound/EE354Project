@@ -72,6 +72,8 @@ module vga_top(
 	reg [3:0]	SSD;
 	wire [3:0]	SSD3, SSD2, SSD1, SSD0;
 	reg [7:0]  SSD_CATHODES;
+	wire [6:0] row, col;
+	wire [11:0] color_data;
 
 	// disable mamory ports
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
@@ -92,7 +94,8 @@ module vga_top(
     end
 
 	assign	sys_clk = DIV_CLK[25];
-
+	assign row = 6'b0001000;
+	assign col = 6'b0001000;
 
 	// the state module
 	doodle_sm doodle_sm(.Clk(sys_clk), .Reset(Reset), .Start(Start_Ack_Pulse), .Ack(Start_Ack_Pulse), .Jin(Jin), .J(J), 
@@ -100,9 +103,11 @@ module vga_top(
 						  .bright(bright), .hCount(hc), .vCount(vc), .rgb(rgb), .pixel_x(pixel_x), .pixel_y(pixel_y), .object_x(object_x),
 						  .object_y(object_y), .is_in_middle(is_in_middle) );
 
+	//doodlejump_bar_green_rom doodlejump_bar_green_rom(.clk(sys_clk),.row(row),.col(col),.color_data(color_data));
+
 
 	/* Use LEDs to see which state we're in */
-	assign {Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0} = {q_I, q_Up, q_Down, q_Done, 4'b1111};
+	assign {Ld7, Ld6, Ld5, Ld4, Ld3, Ld2, Ld1, Ld0} = {q_I, q_Up, q_Down, q_Done, 4'b0000};
 
 	assign SSD3 = 4'b0000;
 	assign SSD2 = 4'b0000;

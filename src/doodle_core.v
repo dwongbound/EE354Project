@@ -50,6 +50,22 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
     reg [10:0] v_counter;
     reg [10:0] h_counter;
 
+    reg [7:0] image_data [0:255][0:255];
+    reg[15:0] mem_address;
+    reg [9:0] x_offset = 0;
+    reg [9:0] y_offset = 50;
+    wire pixel_data;
+    /*
+    initial begin
+    $readmemb("green.mif", image_data);
+    end
+    */
+
+    //wire [11:0] color_data;
+
+   // Resize_green_rom Resize_green_rom(.clk(Clk),.row(vCount),.col(hCount),.color_data(color_data));
+
+
     
     /*
         The two wires represent blocks. Can add more as needed.
@@ -151,12 +167,25 @@ module doodle_sm(Clk, Reset, Start, Ack, Jin, J, Min, M, Curr, i_score, q_I, q_U
     always@ (*) // paint a white box on a red background
     	if (~bright)
 		rgb = BLACK; // force black if not bright
-	 else if (B1 == 1 || B2==1)
+	 else if (B1 == 1 || B2 ==1 || B3==1 || B4==1 || B5==1 || B6==1 ||  B7==1 || B8==1 || B9==1 || B10==1|| B11==1 || B12==1)
 		rgb = GREEN;
 	 else
 		rgb = RED; // background color
-
-    assign B1 = (hCount>= 600 && hCount <= 620) && (vCount>=(v_counter+300) && vCount<=(v_counter+330));
-    assign B2 = (hCount>=300 && hCount <= 340) && (vCount>=(v_counter+200) && vCount<=(v_counter+230));
+    /*
+    assign mem_address = {y_offset, x_offset, 9'b0};
+    assign pixel_data = image_data[mem_address];
+    */
+    assign B1 = (hCount>= 256 && hCount <= 320) && (vCount>=(v_counter+200) && vCount<=(v_counter+216));
+    assign B2 = (hCount>=374 && hCount <= 438) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
+    assign B3 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
+    assign B4 = (hCount>=200 && hCount <= 264) && (vCount>=(v_counter+100) && vCount<=(v_counter+116));
+    assign B5 = (hCount>= 256 && hCount <= 320) && (vCount>=(v_counter+450) && vCount<=(v_counter+466));
+    assign B6 = (hCount>=374 && hCount <= 438) && (vCount>=(v_counter+145) && vCount<=(v_counter+161));
+    assign B7 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+145) && vCount<=(v_counter+161));
+    assign B8 = (hCount>=200 && hCount <= 264) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
+    assign B9 = (hCount>=300 && hCount <= 364) && (vCount>=(v_counter+300) && vCount<=(v_counter+316));
+    assign B10 = (hCount>=400 && hCount<=464) && (vCount>=(v_counter + 330) && vCount <= (v_counter + 346));
+    assign B11 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+72) && vCount<=(v_counter+88));
+    assign B12 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
 
 endmodule
