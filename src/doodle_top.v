@@ -5,7 +5,7 @@
 // 
 // Create Date:    12:18:00 12/14/2017 
 // Design Name: 
-// Module Name:    vga_top 
+// Module Name:    doodle_top 
 // Project Name: 
 // Target Devices: 
 // Tool versions: 
@@ -21,7 +21,7 @@
 // Author: Yue (Julien) Niu
 // Description: Port from NEXYS3 to NEXYS4
 //////////////////////////////////////////////////////////////////////////////////
-module vga_top(
+module doodle_top(
 	input ClkPort,
 	input BtnC,
 	input BtnU,
