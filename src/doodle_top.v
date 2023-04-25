@@ -195,6 +195,7 @@ module doodle_top(
 
 
 	// SSD Parameters
+	// SSDs go left to right, so SSD0 is on the left and SSD7 is on the right
 	assign SSD7 = {2'b00, ypos[9:8]};
 	assign SSD6 = ypos[7:4];
 	assign SSD5 = ypos[3:0];
