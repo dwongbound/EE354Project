@@ -92,14 +92,19 @@ module doodle_sm(
                 
                 DOWN:
                     begin 
-                        if ((object_x==300 && object_y==230)) // Dummy code, will add condition later /* hit block */
+                        if (((object_x>=374 && object_x<=438) && (object_y==490 || object_y==145)) || 
+                            ((object_x>=256 && object_x<=320) && (object_y==200 || object_y==450)) || 
+                            ((object_x>=600 && object_x<=664) && (object_y==145 || object_y==72 || object_y==490 || object_y==330)) || 
+                            ((object_x>=300 && object_x<=364) && (object_y==300)) ||   
+                            ((object_x>=200 && object_x<=264) && (object_y==330 || object_y==100)) ||  
+                            ((object_x>=400 && object_x<=464) && (object_y==330))) // Dummy code, will add condition later /* hit block */
                             begin
                             state <= UP;
                             Curr <= 0;
                             end
                         else
                         begin
-                            if (1) // Dummy code, will add condition later /* reached bottom of screen */
+                            if (object_y==510) 
                                 state <= DONE;
                             else 
                             begin
@@ -120,7 +125,6 @@ module doodle_sm(
         end
 
     end
-
 
     // Might need to put 
 
