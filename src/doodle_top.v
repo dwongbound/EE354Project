@@ -55,19 +55,8 @@ module doodle_top(
 	wire [3:0] anode;
 	wire [11:0] rgb;
 
-	display_controller dc(
-		.clk(ClkPort),
-		.hSync(hSync), .vSync(vSync),
-		.bright(bright),
-		.hCount(hc), .vCount(vc)
-	);
-
 	//vga_bitchange vbc(.clk(ClkPort), .bright(bright), .button(BtnU), .hCount(hc), .vCount(vc), .rgb(rgb), .score(score));
 	//counter cnt(.clk(ClkPort), .displayNumber(score), .anode(anode), .ssdOut(ssdOut));
-	
-	//assign Dp = 1;
-	//assign {Ca, Cb, Cc, Cd, Ce, Cf, Cg} = ssdOut[6 : 0];
-    //assign {An7, An6, An5, An4, An3, An2, An1, An0} = {4'b1111, anode};
 
 	assign vgaR = rgb[11 : 8];
 	assign vgaG = rgb[7  : 4];
@@ -75,14 +64,16 @@ module doodle_top(
 	
 	// Local Signals
 	wire Start_Ack_Pulse;
-	wire board_clk, sys_clk;
+	wire sys_clk;
+	assign Reset = BtnC;
+	assign Start_Ack_Pulse = BtnL;
 	reg [26:0] DIV_CLK;
 	wire q_I, q_Sub, q_Mult, q_Done;
 	wire [7:0] Curr, i_score;
 	wire [1:0] ssdscan_clk;
 	reg [3:0] SSD;
 	wire [3:0] SSD3, SSD2, SSD1, SSD0;
-	reg [7:0]  SSD_CATHODES;
+	reg [7:0] SSD_CATHODES;
 	wire [6:0] row, col;
 	wire [11:0] color_data;
 
@@ -98,15 +89,12 @@ module doodle_top(
 	// Left has to have no MSB but also not be empty
 	assign parse_left = (~(acl_data[9]) && ((acl_data[8]) || (acl_data[7]) || (acl_data[6]) || (acl_data[5])));
 
-	assign board_clk = ClkPort;
-	assign Reset = BtnC;
-	assign Start_Ack_Pulse = BtnU;
-
-	// Hard code jump height
+	// Related to doodle itself
 	parameter JUMP_HEIGHT = 250;
+	reg [9:0] xpos, ypos;
 
 	// Clock management
-	always @(posedge board_clk, posedge Reset) 	
+	always @(posedge ClkPort, posedge Reset) 	
     begin							
         if (Reset)
 		DIV_CLK <= 0;
@@ -121,6 +109,13 @@ module doodle_top(
 	assign move_clk = DIV_CLK[19]; //slower clock to drive the movement of objects on the vga screen
 	wire v_counter; // keep track of screen scrolling as doodle jumps up
 
+	display_controller dc(
+		.clk(ClkPort),
+		.hSync(hSync), .vSync(vSync),
+		.bright(bright),
+		.hCount(hc), .vCount(vc)
+	);
+
 	// the state module
 	doodle_sm doodle_sm(
 		.Clk(sys_clk),
@@ -132,7 +127,7 @@ module doodle_top(
 		.i_score(i_score),
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
 		.hCount(hc), .vCount(vc),
-		.pixel_x(pixel_x), .pixel_y(pixel_y),
+		.pixel_x(xpos), .pixel_y(ypos), // xpos and ypos is updated in vga_controller.
 		.object_x(object_x), .object_y(object_y),
 		.is_in_middle(is_in_middle) 
 	);
@@ -199,7 +194,7 @@ module doodle_top(
 	/* Use LEDs to see which state we're in and which side we are tilting */
 	// Using right 4 to indicate tilt right, left 4 to indicate tilt left, and middle four to indicate state.
 	// Note left leds are flipped on purpose to make it more symmetrical
-	assign {Ld12, Ld13, Ld14, Ld15, Ld9, Ld8, Ld7, Ld6, Ld3, Ld2, Ld1, Ld0} = {left_leds, q_I, q_Up, q_Down, q_Done, right_leds};
+	assign {Ld12, Ld13, Ld14, Ld15, Ld11, Ld9, Ld8, Ld7, Ld6, Ld3, Ld2, Ld1, Ld0} = {left_leds, Start_Ack_Pulse, q_I, q_Up, q_Down, q_Done, right_leds};
 
 
 	// SSD Parameters
@@ -209,48 +204,48 @@ module doodle_top(
 	assign SSD0 = (q_Done) ? i_score[3:0] : 4'b0000;
 
 	assign ssdscan_clk = DIV_CLK[19:18];
-
-	assign AN0	= ~(~(ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 00
-	assign AN1	= ~(~(ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 01
-	assign AN2	= ~( (ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 10
-	assign AN3	= ~( (ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 11
+	assign AN0	= !(~(ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 00
+	assign AN1	= !(~(ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 01
+	assign AN2	= !( (ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 10
+	assign AN3	= !( (ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 11
 
 	assign {AN7, AN6, AN5, AN4} = 4'b1111;
 
 	always @ (ssdscan_clk, SSD0, SSD1, SSD2, SSD3)
 	begin : SSD_SCAN_OUT
 		case (ssdscan_clk) 
-				  2'b00: SSD = SSD3     ;	// ****** TODO  in Part 2 ******
-				  2'b01: SSD = SSD2    ;  	// Complete the four lines
-				  
-				  2'b10: SSD = SSD1   ;
-				  2'b11: SSD = SSD0    ;
+			2'b00: SSD = SSD3;
+			2'b01: SSD = SSD2;
+			2'b10: SSD = SSD1;
+			2'b11: SSD = SSD0;
 		endcase 
 	end
 
+	always @ (SSD) 
+	begin : HEX_TO_SSD
+		case (SSD) 
+			4'b0000: SSD_CATHODES = 8'b00000011; // 0
+			4'b0001: SSD_CATHODES = 8'b10011111; // 1
+			4'b0010: SSD_CATHODES = 8'b00100101; // 2
+			4'b0011: SSD_CATHODES = 8'b00001101; // 3
+			4'b0100: SSD_CATHODES = 8'b10011001; // 4
+			4'b0101: SSD_CATHODES = 8'b01001001; // 5
+			4'b0110: SSD_CATHODES = 8'b01000001; // 6
+			4'b0111: SSD_CATHODES = 8'b00011111; // 7
+			4'b1000: SSD_CATHODES = 8'b00000001; // 8
+			4'b1001: SSD_CATHODES = 8'b00001001; // 9
+			4'b1010: SSD_CATHODES = 8'b00010001; // A
+			4'b1011: SSD_CATHODES = 8'b11000001; // B
+			4'b1100: SSD_CATHODES = 8'b01100011; // C
+			4'b1101: SSD_CATHODES = 8'b10000101; // D
+			4'b1110: SSD_CATHODES = 8'b01100001; // E
+			4'b1111: SSD_CATHODES = 8'b01110001; // F    
+			default: SSD_CATHODES = 8'bXXXXXXXX; // default is not needed as we covered all cases
+		endcase
+	end	
+
+		
 	/* Use SSDs to print score when arriving in DONE state */
 	assign {Ca, Cb, Cc, Cd, Ce, Cf, Cg, Dp} = {SSD_CATHODES};
-	always @ (SSD) 
-		begin : HEX_TO_SSD
-			case (SSD) 
-				4'b0000: SSD_CATHODES = 8'b00000011; // 0
-				4'b0001: SSD_CATHODES = 8'b10011111; // 1
-				4'b0010: SSD_CATHODES = 8'b00100101; // 2
-				4'b0011: SSD_CATHODES = 8'b00001101; // 3
-				4'b0100: SSD_CATHODES = 8'b10011001; // 4
-				4'b0101: SSD_CATHODES = 8'b01001001; // 5
-				4'b0110: SSD_CATHODES = 8'b01000001; // 6
-				4'b0111: SSD_CATHODES = 8'b00011111; // 7
-				4'b1000: SSD_CATHODES = 8'b00000001; // 8
-				4'b1001: SSD_CATHODES = 8'b00001001; // 9
-				4'b1010: SSD_CATHODES = 8'b00010001; // A
-				4'b1011: SSD_CATHODES = 8'b11000001; // B
-				4'b1100: SSD_CATHODES = 8'b01100011; // C
-				4'b1101: SSD_CATHODES = 8'b10000101; // D
-				4'b1110: SSD_CATHODES = 8'b01100001; // E
-				4'b1111: SSD_CATHODES = 8'b01110001; // F    
-				default: SSD_CATHODES = 8'bXXXXXXXX; // default is not needed as we covered all cases
-			endcase
-		end	
 
 endmodule

@@ -13,7 +13,7 @@ module doodle_sm(
     output q_I, q_Up, q_Down, q_Done,
     input [9:0] hCount, vCount,
     input [7:0] pixel_x, pixel_y, // pixel_x and pixel_y represent the current pixel being displayed on the screen.
-    input object_x, object_y, // object_x and object_y represent the position of the object being checked
+    input [9:0] object_x, object_y, // object_x and object_y represent the position of the object being checked
     output reg is_in_middle,
     output reg[9:0] v_counter    
 );

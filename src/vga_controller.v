@@ -4,15 +4,17 @@ module vga_controller(
 	input clk, //this clock must be a slow enough clock to view the changing positions of the objects
 	input bright,
 	input rst,
-	input up, input down, input left, input right,
+	input up, down, left, right,
 	input [9:0] hCount, vCount,
 	output reg [11:0] rgb,
 	input v_counter,
-	input [4:0] tilt_intensity // this only goes from 1 to 8
+	input [4:0] tilt_intensity, // this only goes from 1 to 8
+	// these two values dictate the center of the doodle, incrementing and decrementing them leads the block to move in certain directions
+	output reg [9:0] xpos, ypos
 );
 
     // Temp size of doodle's radius
-    localparam DOODLE_RADIUS = 20;
+    localparam DOODLE_RADIUS = 10;
     
 	// Temp variable used to calculate location of filled block
 	wire block_fill;
@@ -22,18 +24,14 @@ module vga_controller(
 	parameter WHITE = 12'b1111_1111_1111;
 	parameter RED   = 12'b1111_0000_0000;
 	parameter GREEN = 12'b0000_1111_0000;
-
-	//these two values dictate the center of the block, incrementing and decrementing them leads the block to move in certain directions
-	reg [9:0] xpos, ypos;
-
 	
 	always@(posedge clk, posedge rst) 
 	begin
-		if(rst)
+		if (rst)
 		begin 
-			//rough values for center of screen
-			xpos<=450;
-			ypos<=250;
+			// rough values for center of screen
+			xpos <= 450;
+			ypos <= 250;
 		end
 		else if (clk) begin
 		
@@ -53,7 +51,7 @@ module vga_controller(
 				if (xpos == 150)
 					xpos <= 800;
 			end
-			else if (up) begin
+			if (up) begin
 				ypos <= ypos - 2;
 				if(ypos == 34)
 					ypos <= 514;
@@ -67,21 +65,20 @@ module vga_controller(
 	end
 
 	//the +-5 for the positions give the dimension of the block (i.e. it will be 10x10 pixels)
-	assign block_fill = vCount >= (ypos-10) && vCount <= (ypos+10) && hCount >= (xpos-10) && hCount <= (xpos+10);
+	assign block_fill = vCount >= (ypos-DOODLE_RADIUS) && vCount <= (ypos+DOODLE_RADIUS) && hCount >= (xpos-DOODLE_RADIUS) && hCount <= (xpos+DOODLE_RADIUS);
 	
 	always@ (*) // paint a white box on a red background
     	if (~bright)
 			rgb = BLACK; // force black if not bright
+		else if (rst)
+			rgb = WHITE;
 		else if (block_fill)
 			rgb = RED;
 		else if (B1 == 1 || B2 ==1 || B3==1 || B4==1 || B5==1 || B6==1 ||  B7==1 || B8==1 || B9==1 || B10==1|| B11==1 || B12==1)
 			rgb = GREEN;
 		else
 			rgb = BLACK; // background color
-    /*
-    assign mem_address = {y_offset, x_offset, 9'b0};
-    assign pixel_data = image_data[mem_address];
-    */
+
     assign B1 = (hCount>= 256 && hCount <= 320) && (vCount>=(v_counter+200) && vCount<=(v_counter+216));
     assign B2 = (hCount>=374 && hCount <= 438) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
     assign B3 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
