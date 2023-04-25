@@ -10,7 +10,7 @@ module vga_controller(
 	input v_counter,
 	input [4:0] tilt_intensity, // this only goes from 1 to 8
 	// these two values dictate the center of the doodle, incrementing and decrementing them leads the block to move in certain directions
-	output reg [9:0] xpos, ypos
+	output [9:0] xpos, ypos
 );
 
     // Temp size of doodle's radius
@@ -18,6 +18,9 @@ module vga_controller(
     
 	// Temp variable used to calculate location of filled block
 	wire block_fill;
+
+	// Temp new xpos and ypos
+	reg [9:0] temp_x, temp_y;
 
 	// Const color values
 	parameter BLACK = 12'b0000_0000_0000;
@@ -30,8 +33,8 @@ module vga_controller(
 		if (rst)
 		begin 
 			// rough values for center of screen
-			xpos <= 450;
-			ypos <= 250;
+			temp_x <= 450;
+			temp_y <= 250;
 		end
 		else if (clk) begin
 		
@@ -42,30 +45,30 @@ module vga_controller(
 			corresponds to ~(783,515).  
 		*/
 			if (right) begin
-				xpos <= xpos + tilt_intensity; //change the amount you increment to make the speed faster 
-				if(xpos == 800) //these are rough values to attempt looping around, you can fine-tune them to make it more accurate- refer to the block comment above
-					xpos <= 150;
+				temp_x <= temp_x + tilt_intensity; //change the amount you increment to make the speed faster 
+				if(temp_x == 800) //these are rough values to attempt looping around, you can fine-tune them to make it more accurate- refer to the block comment above
+					temp_x <= 150;
 			end
 			else if (left) begin
-				xpos <= xpos - tilt_intensity;
-				if (xpos == 150)
-					xpos <= 800;
+				temp_x <= temp_x - tilt_intensity;
+				if (temp_x == 150)
+					temp_x <= 800;
 			end
 			if (up) begin
-				ypos <= ypos - 2;
-				if(ypos == 34)
-					ypos <= 514;
+				temp_y <= temp_y - 2;
+				if(temp_y == 34)
+					temp_y <= 514;
 			end
 			else if (down) begin
-				ypos <= ypos + 2;
-				if (ypos == 514)
-					ypos <= 34;
+				temp_y <= temp_y + 2;
+				if (temp_y == 514)
+					temp_y <= 34;
 			end
 		end
 	end
 
 	//the +-5 for the positions give the dimension of the block (i.e. it will be 10x10 pixels)
-	assign block_fill = vCount >= (ypos-DOODLE_RADIUS) && vCount <= (ypos+DOODLE_RADIUS) && hCount >= (xpos-DOODLE_RADIUS) && hCount <= (xpos+DOODLE_RADIUS);
+	assign block_fill = vCount >= (temp_y-DOODLE_RADIUS) && vCount <= (temp_y+DOODLE_RADIUS) && hCount >= (temp_x-DOODLE_RADIUS) && hCount <= (temp_x+DOODLE_RADIUS);
 	
 	always@ (*) // paint a white box on a red background
     	if (~bright)
@@ -92,5 +95,8 @@ module vga_controller(
     assign B11 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+72) && vCount<=(v_counter+88));
     assign B12 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
 	
+	// Assign xpos and ypos
+	assign xpos = temp_x;
+	assign ypos = temp_y;
 	
 endmodule

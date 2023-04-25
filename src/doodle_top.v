@@ -70,9 +70,9 @@ module doodle_top(
 	reg [26:0] DIV_CLK;
 	wire q_I, q_Sub, q_Mult, q_Done;
 	wire [7:0] Curr, i_score;
-	wire [1:0] ssdscan_clk;
+	wire [2:0] ssdscan_clk;
 	reg [3:0] SSD;
-	wire [3:0] SSD3, SSD2, SSD1, SSD0;
+	wire [3:0] SSD7, SSD6, SSD5, SSD4, SSD3, SSD2, SSD1, SSD0;
 	reg [7:0] SSD_CATHODES;
 	wire [6:0] row, col;
 	wire [11:0] color_data;
@@ -91,7 +91,7 @@ module doodle_top(
 
 	// Related to doodle itself
 	parameter JUMP_HEIGHT = 250;
-	reg [9:0] xpos, ypos;
+	wire [9:0] xpos, ypos;
 
 	// Clock management
 	always @(posedge ClkPort, posedge Reset) 	
@@ -127,8 +127,8 @@ module doodle_top(
 		.i_score(i_score),
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
 		.hCount(hc), .vCount(vc),
-		.pixel_x(xpos), .pixel_y(ypos), // xpos and ypos is updated in vga_controller.
-		.object_x(object_x), .object_y(object_y),
+		.pixel_x(pixel_x), .pixel_y(pixel_y), // xpos and ypos is updated in vga_controller.
+		.object_x(xpos), .object_y(ypos),
 		.is_in_middle(is_in_middle) 
 	);
 
@@ -143,16 +143,13 @@ module doodle_top(
 		.clk(move_clk),
 		.bright(bright),
 		.rst(BtnC),
-		.up(BtnU),
-		.down(BtnD),
-		.left(parse_left),
-		.right(parse_right),
-		.hCount(hc),
-		.vCount(vc),
+		.up(BtnU), .down(BtnD),
+		.left(parse_left), .right(parse_right),
+		.hCount(hc), .vCount(vc),
 		.rgb(rgb),
 		.v_counter(v_counter),
-		.tilt_intensity(tilt_intensity)
-
+		.tilt_intensity(tilt_intensity),
+		.xpos(xpos), .ypos(ypos)
 	);
 
 	// Controls accelerometer data
@@ -198,32 +195,43 @@ module doodle_top(
 
 
 	// SSD Parameters
-	assign SSD3 = tilt_intensity;
-	assign SSD2 = 4'b0000;
-	assign SSD1 = (q_Done) ? i_score[7:4] : 4'b0000;
-	assign SSD0 = (q_Done) ? i_score[3:0] : 4'b0000;
+	assign SSD7 = {2'b00, ypos[9:8]};
+	assign SSD6 = ypos[7:4];
+	assign SSD5 = ypos[3:0];
+	assign SSD4 = {2'b00, xpos[9:8]};
+	assign SSD3 = xpos[7:4];
+	assign SSD2 = xpos[3:0];
+	assign SSD1 = i_score[7:4];
+	assign SSD0 = i_score[3:0];
 
-	assign ssdscan_clk = DIV_CLK[19:18];
-	assign AN0	= !(~(ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 00
-	assign AN1	= !(~(ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 01
-	assign AN2	= !( (ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 10
-	assign AN3	= !( (ssdscan_clk[1]) &&  (ssdscan_clk[0]));  // when ssdscan_clk = 11
+	assign ssdscan_clk = DIV_CLK[19:17];
+	assign An0	= !((ssdscan_clk[2]) && (ssdscan_clk[1]) && (ssdscan_clk[0]));  // when ssdscan_clk = 000
+	assign An1	= !((ssdscan_clk[2]) && (ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 001
+	assign An2	=  !((ssdscan_clk[2]) && ~(ssdscan_clk[1]) && (ssdscan_clk[0]));  // when ssdscan_clk = 010
+	assign An3	=  !((ssdscan_clk[2]) && ~(ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 011
+	assign An4	= !(~(ssdscan_clk[2]) && (ssdscan_clk[1]) && (ssdscan_clk[0]));  // when ssdscan_clk = 100
+	assign An5	= !(~(ssdscan_clk[2]) && (ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 101
+	assign An6	=  !(~(ssdscan_clk[2]) && ~(ssdscan_clk[1]) && (ssdscan_clk[0]));  // when ssdscan_clk = 110
+	assign An7	=  !(~(ssdscan_clk[2]) && ~(ssdscan_clk[1]) && ~(ssdscan_clk[0]));  // when ssdscan_clk = 111
 
-	assign {AN7, AN6, AN5, AN4} = 4'b1111;
-
-	always @ (ssdscan_clk, SSD0, SSD1, SSD2, SSD3)
+	always @ (ssdscan_clk, SSD0, SSD1, SSD2, SSD3, SSD4, SSD5, SSD6, SSD7)
 	begin : SSD_SCAN_OUT
 		case (ssdscan_clk) 
-			2'b00: SSD = SSD3;
-			2'b01: SSD = SSD2;
-			2'b10: SSD = SSD1;
-			2'b11: SSD = SSD0;
+				  3'b000: SSD = SSD0;
+				  3'b001: SSD = SSD1;
+				  3'b010: SSD = SSD2;
+				  3'b011: SSD = SSD3;
+				  3'b100: SSD = SSD4;
+				  3'b101: SSD = SSD5;
+				  3'b110: SSD = SSD6;
+				  3'b111: SSD = SSD7;
 		endcase 
 	end
 
+	// Following is Hex-to-SSD conversion
 	always @ (SSD) 
 	begin : HEX_TO_SSD
-		case (SSD) 
+		case (SSD) // in this solution file the dot points are made to glow by making Dp = 0
 			4'b0000: SSD_CATHODES = 8'b00000011; // 0
 			4'b0001: SSD_CATHODES = 8'b10011111; // 1
 			4'b0010: SSD_CATHODES = 8'b00100101; // 2
@@ -243,9 +251,8 @@ module doodle_top(
 			default: SSD_CATHODES = 8'bXXXXXXXX; // default is not needed as we covered all cases
 		endcase
 	end	
-
-		
-	/* Use SSDs to print score when arriving in DONE state */
+	
+	// reg [7:0]  SSD_CATHODES;
 	assign {Ca, Cb, Cc, Cd, Ce, Cf, Cg, Dp} = {SSD_CATHODES};
 
 endmodule
