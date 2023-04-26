@@ -69,7 +69,6 @@ module doodle_top(
 	assign Start_Ack_Pulse = BtnL;
 	reg [26:0] DIV_CLK;
 	wire q_I, q_Sub, q_Mult, q_Done;
-	wire [7:0] Curr, i_score;
 	wire [2:0] ssdscan_clk;
 	reg [3:0] SSD;
 	wire [3:0] SSD7, SSD6, SSD5, SSD4, SSD3, SSD2, SSD1, SSD0;
@@ -92,6 +91,7 @@ module doodle_top(
 	// Related to doodle itself
 	parameter JUMP_HEIGHT = 250;
 	wire [9:0] xpos, ypos;
+	wire [7:0] up_count, i_score;
 
 	// Clock management
 	always @(posedge ClkPort, posedge Reset) 	
@@ -123,12 +123,12 @@ module doodle_top(
 		.Start(Start_Ack_Pulse),
 		.Ack(Start_Ack_Pulse),
 		.JUMP_HEIGHT(JUMP_HEIGHT),
-		.Curr(Curr),
+		.up_count(up_count),
 		.i_score(i_score),
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
 		.hCount(hc), .vCount(vc),
-		.pixel_x(pixel_x), .pixel_y(pixel_y), // xpos and ypos is updated in vga_controller.
-		.object_x(ypos), .object_y(xpos),
+		.pixel_x(pixel_x), .pixel_y(pixel_y),
+		.object_x(xpos), .object_y(ypos), // xpos and ypos is updated in vga_controller, then passed to core design.
 		.is_in_middle(is_in_middle)
 	);
 
@@ -149,7 +149,9 @@ module doodle_top(
 		.rgb(rgb),
 		.v_counter(v_counter),
 		.tilt_intensity(tilt_intensity),
-		.xpos(xpos), .ypos(ypos)
+		.xpos(xpos), .ypos(ypos),
+		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
+		.up_count(up_count)
 	);
 
 	// Controls accelerometer data
@@ -218,14 +220,14 @@ module doodle_top(
 	always @ (ssdscan_clk, SSD0, SSD1, SSD2, SSD3, SSD4, SSD5, SSD6, SSD7)
 	begin : SSD_SCAN_OUT
 		case (ssdscan_clk) 
-				  3'b000: SSD = SSD0;
-				  3'b001: SSD = SSD1;
-				  3'b010: SSD = SSD2;
-				  3'b011: SSD = SSD3;
-				  3'b100: SSD = SSD4;
-				  3'b101: SSD = SSD5;
-				  3'b110: SSD = SSD6;
-				  3'b111: SSD = SSD7;
+			3'b000: SSD = SSD0;
+			3'b001: SSD = SSD1;
+			3'b010: SSD = SSD2;
+			3'b011: SSD = SSD3;
+			3'b100: SSD = SSD4;
+			3'b101: SSD = SSD5;
+			3'b110: SSD = SSD6;
+			3'b111: SSD = SSD7;
 		endcase 
 	end
 

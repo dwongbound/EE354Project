@@ -10,7 +10,9 @@ module vga_controller(
 	input v_counter,
 	input [4:0] tilt_intensity, // this only goes from 1 to 8
 	// these two values dictate the center of the doodle, incrementing and decrementing them leads the block to move in certain directions
-	output [9:0] xpos, ypos
+	output [9:0] xpos, ypos,
+	input q_Done, q_I, q_Up, q_Down,
+	output [7:0] up_count, score
 );
 
     // Temp size of doodle's radius
@@ -19,8 +21,9 @@ module vga_controller(
 	// Temp variable used to calculate location of filled block
 	wire block_fill;
 
-	// Temp new xpos and ypos
+	// Temp vars
 	reg [9:0] temp_x, temp_y;
+	reg [7:0] temp_up_count, temp_score; // To count how many pixels it went up
 
 	// Const color values
 	parameter BLACK = 12'b0000_0000_0000;
@@ -30,11 +33,12 @@ module vga_controller(
 	
 	always@(posedge clk, posedge rst) 
 	begin
-		if (rst)
+		if (rst || q_I)
 		begin 
-			// rough values for center of screen
-			temp_x <= 450;
-			temp_y <= 250;
+			// rough values for above lowest block 
+			temp_x <= 406;
+			temp_y <= 477;
+			temp_up_count <= 0; // default
 		end
 		else if (clk) begin
 		
@@ -46,28 +50,26 @@ module vga_controller(
 		*/
 			if (right) begin
 				temp_x <= temp_x + tilt_intensity; //change the amount you increment to make the speed faster 
-				if(temp_x == 800) //these are rough values to attempt looping around, you can fine-tune them to make it more accurate- refer to the block comment above
-					temp_x <= 150;
+				if(temp_x >= 775)
+					temp_x <= 144;
 			end
 			else if (left) begin
 				temp_x <= temp_x - tilt_intensity;
-				if (temp_x == 150)
-					temp_x <= 800;
+				if (temp_x <= 143)
+					temp_x <= 774;
 			end
-			if (up) begin
+			if (q_Up || (up && q_I)) begin // Second or for debugging
 				temp_y <= temp_y - 2;
-				if(temp_y == 34)
-					temp_y <= 514;
+				temp_up_count <= temp_up_count + 2;
 			end
-			else if (down) begin
+			else if (q_Down || (down && q_I)) begin
 				temp_y <= temp_y + 2;
-				if (temp_y == 514)
-					temp_y <= 34;
+				temp_up_count <= temp_up_count - 2;
 			end
 		end
 	end
 
-	//the +-5 for the positions give the dimension of the block (i.e. it will be 10x10 pixels)
+	// Create Doodle's hitbox
 	assign block_fill = vCount >= (temp_y-DOODLE_RADIUS) && vCount <= (temp_y+DOODLE_RADIUS) && hCount >= (temp_x-DOODLE_RADIUS) && hCount <= (temp_x+DOODLE_RADIUS);
 	
 	always@ (*) // paint a white box on a red background
@@ -75,6 +77,8 @@ module vga_controller(
 			rgb = BLACK; // force black if not bright
 		else if (rst)
 			rgb = WHITE;
+		else if (q_Done)
+			rgb = RED;
 		else if (block_fill)
 			rgb = RED;
 		else if (B1 == 1 || B2 ==1 || B3==1 || B4==1 || B5==1 || B6==1 ||  B7==1 || B8==1 || B9==1 || B10==1|| B11==1 || B12==1)
@@ -82,8 +86,6 @@ module vga_controller(
 		else
 			rgb = BLACK; // background color
 	
-	//assign whiteZone = ((hCount >= 10'd144) && (hCount <= 10'd784)) && ((vCount >= 10'd400) && (vCount <= 10'd475)) ? 1 : 0;
-
     assign B1 = (hCount>= 256 && hCount <= 320) && (vCount>=(v_counter+200) && vCount<=(v_counter+216));
     assign B2 = (hCount>=374 && hCount <= 438) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
     assign B3 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
@@ -97,8 +99,9 @@ module vga_controller(
     assign B11 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+72) && vCount<=(v_counter+88));
     assign B12 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
 	
-	// Assign xpos and ypos
+	// Assign temp vars to outputs
 	assign xpos = temp_x;
 	assign ypos = temp_y;
+	assign up_count = temp_up_count;
 	
 endmodule
