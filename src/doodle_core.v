@@ -79,8 +79,7 @@ module doodle_sm(
                             Curr <= Curr + 1;
                             i_score <= i_score + 1;
                         end
-                        if (pixel_x >= object_x - DOODLE_RADIUS && pixel_x <= object_x + DOODLE_RADIUS &&
-                            pixel_y >= object_y - DOODLE_RADIUS && pixel_y <= object_y + DOODLE_RADIUS) 
+                        if (object_y >= V_MIDDLE - DOODLE_RADIUS && object_y <= V_MIDDLE + DOODLE_RADIUS)  
                             begin
                             is_in_middle <= 1;
                             end
@@ -92,19 +91,14 @@ module doodle_sm(
                 
                 DOWN:
                     begin 
-                        if (((object_x>=374 && object_x<=438) && (object_y==490 || object_y==145)) || 
-                            ((object_x>=256 && object_x<=320) && (object_y==200 || object_y==450)) || 
-                            ((object_x>=600 && object_x<=664) && (object_y==145 || object_y==72 || object_y==490 || object_y==330)) || 
-                            ((object_x>=300 && object_x<=364) && (object_y==300)) ||   
-                            ((object_x>=200 && object_x<=264) && (object_y==330 || object_y==100)) ||  
-                            ((object_x>=400 && object_x<=464) && (object_y==330))) // Dummy code, will add condition later /* hit block */
+                        if (object_x==374) // First test x-coordinates, check if doodle's x-coordinate is at 374, if it is, then the state will transition to UP
                             begin
                             state <= UP;
                             Curr <= 0;
                             end
                         else
                         begin
-                            if (object_y==510) 
+                            if (object_y==516) 
                                 state <= DONE;
                             else 
                             begin
@@ -140,3 +134,14 @@ module doodle_sm(
     end
 
 endmodule
+
+// If statement to check if landed on platforms, going to first test two platforms and then incorporate commented if statement
+
+/*
+                        if (((object_x>=374 && object_x<=438) && (object_y==482 || object_y==137)) || 
+                            ((object_x>=256 && object_x<=320) && (object_y==192 || object_y==452)) || 
+                            ((object_x>=600 && object_x<=664) && (object_y==137 || object_y==64 || object_y==482 || object_y==322)) || 
+                            ((object_x>=300 && object_x<=364) && (object_y==292)) ||   
+                            ((object_x>=200 && object_x<=264) && (object_y==322 || object_y==92)) ||  
+                            ((object_x>=400 && object_x<=464) && (object_y==322))) 
+*/

@@ -128,8 +128,8 @@ module doodle_top(
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
 		.hCount(hc), .vCount(vc),
 		.pixel_x(pixel_x), .pixel_y(pixel_y), // xpos and ypos is updated in vga_controller.
-		.object_x(xpos), .object_y(ypos),
-		.is_in_middle(is_in_middle) 
+		.object_x(ypos), .object_y(xpos),
+		.is_in_middle(is_in_middle)
 	);
 
 	// Generates 4MHz clock for spi master
