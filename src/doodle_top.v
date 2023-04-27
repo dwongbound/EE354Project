@@ -118,7 +118,7 @@ module doodle_top(
 
 	// the state module
 	doodle_sm doodle_sm(
-		.Clk(sys_clk),
+		.Clk(move_clk),
 		.Reset(Reset),
 		.Start(Start_Ack_Pulse),
 		.Ack(Start_Ack_Pulse),

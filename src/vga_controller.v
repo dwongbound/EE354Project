@@ -64,7 +64,7 @@ module vga_controller(
 			end
 			else if (q_Down || (down && q_I)) begin
 				temp_y <= temp_y + 2;
-				temp_up_count <= temp_up_count - 2;
+				temp_up_count <= 0;
 			end
 		end
 	end
@@ -91,12 +91,11 @@ module vga_controller(
     assign B3 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
     assign B4 = (hCount>=200 && hCount <= 264) && (vCount>=(v_counter+100) && vCount<=(v_counter+116));
     assign B5 = (hCount>= 256 && hCount <= 320) && (vCount>=(470) && vCount<=(486));
-    assign B9 = (hCount>=300 && hCount <= 364) && (vCount>=(v_counter+300) && vCount<=(v_counter+316));
     assign B6 = (hCount>=374 && hCount <= 438) && (vCount>=(v_counter+145) && vCount<=(v_counter+161));
     assign B7 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+145) && vCount<=(v_counter+161));
     assign B8 = (hCount>=200 && hCount <= 264) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
     assign B9 = (hCount>=300 && hCount <= 364) && (vCount>=(v_counter+300) && vCount<=(v_counter+316));
-    assign B10 = (hCount>=400 && hCount<=464) && (vCount>=(v_counter + 330) && vCount <= (v_counter + 346));
+    assign B10 = (hCount>=400 && hCount<=464) && (vCount>=(v_counter+360) && vCount <= (v_counter + 376));
     assign B11 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+72) && vCount<=(v_counter+88));
     assign B12 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
 	// Assign temp vars to outputs

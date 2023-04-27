@@ -77,25 +77,30 @@ module doodle_sm(
                     end
                 
                 DOWN:
-                    begin 
-                        if (((object_x+DOODLE_RADIUS)>= 374 && (object_x+DOODLE_RADIUS) <= 438) || 
-                            ((object_x+DOODLE_RADIUS)>=256 && (object_x+DOODLE_RADIUS)<=320) || 
-                            ((object_x+DOODLE_RADIUS)>=300 && (object_x+DOODLE_RADIUS)<=364) || 
-                            ((object_x+DOODLE_RADIUS)>=600 && (object_x+DOODLE_RADIUS)<=664) || 
-                            ((object_x+DOODLE_RADIUS)>=200 && (object_x+DOODLE_RADIUS)<=264) || 
-                            ((object_x+DOODLE_RADIUS)>=400 && (object_x+DOODLE_RADIUS)<=464))
-                            //(((object_x+DOODLE_RADIUS)>= 256 && (object_x+DOODLE_RADIUS) <= 320) && ((object_y+DOODLE_RADIUS)>=(v_counter+200) && (object_y+DOODLE_RADIUS)<=(v_counter+216)) ||
-                           // ((object_x+DOODLE_RADIUS)>=374 && (object_x+DOODLE_RADIUS) <= 438) && ((object_y+DOODLE_RADIUS)>=(v_counter+490) && (object_y+DOODLE_RADIUS)<=(v_counter+506)))
-                            // ((object_x+DOODLE_RADIUS)>=600 && (object_x+DOODLE_RADIUS) <= 664) && ((object_y+DOODLE_RADIUS)>=(v_counter+330) && (object_y+DOODLE_RADIUS)<=(v_counter+346)) ||
-                            // ((object_x+DOODLE_RADIUS)>=200 && (object_x+DOODLE_RADIUS) <= 264) && ((object_y+DOODLE_RADIUS)>=(v_counter+100) && (object_y+DOODLE_RADIUS)<=(v_counter+116)) ||
-                            // ((object_x+DOODLE_RADIUS)>= 256 && (object_x+DOODLE_RADIUS) <= 320) && ((object_y+DOODLE_RADIUS)>=(v_counter+450) && (object_y+DOODLE_RADIUS)<=(v_counter+466)) ||
-                            // ((object_x+DOODLE_RADIUS)>=374 && (object_x+DOODLE_RADIUS) <= 438) && ((object_y+DOODLE_RADIUS)>=(v_counter+145) && (object_y+DOODLE_RADIUS)<=(v_counter+161)) ||
-                            // ((object_x+DOODLE_RADIUS)>=600 && (object_x+DOODLE_RADIUS) <= 664) && ((object_y+DOODLE_RADIUS)>=(v_counter+145) && (object_y+DOODLE_RADIUS)<=(v_counter+161)) ||
-                            // ((object_x+DOODLE_RADIUS)>=200 && (object_x+DOODLE_RADIUS) <= 264) && ((object_y+DOODLE_RADIUS)>=(v_counter+330) && (object_y+DOODLE_RADIUS)<=(v_counter+346)) ||
-                            // ((object_x+DOODLE_RADIUS)>=300 && (object_x+DOODLE_RADIUS) <= 364) && ((object_y+DOODLE_RADIUS)>=(v_counter+300) && (object_y+DOODLE_RADIUS)<=(v_counter+316)) ||
-                            // ((object_x+DOODLE_RADIUS)>=400 && (object_x+DOODLE_RADIUS)<=464) && ((object_y+DOODLE_RADIUS)>=(v_counter+330) && (object_y+DOODLE_RADIUS) <= (v_counter+346)) ||
-                            // ((object_x+DOODLE_RADIUS)>=600 && (object_x+DOODLE_RADIUS) <=664) && ((object_y+DOODLE_RADIUS)>=(v_counter+72) && (object_y+DOODLE_RADIUS)<=(v_counter+88)) ||
-                            // ((object_x+DOODLE_RADIUS)>=600 && (object_x+DOODLE_RADIUS) <=664) && ((object_y+DOODLE_RADIUS)>=(v_counter+490) && (object_y+DOODLE_RADIUS)<=(v_counter+506)))
+                    begin
+                        if ( (object_x + DOODLE_RADIUS)>=374 && (object_x + DOODLE_RADIUS)<=438 && (object_y + DOODLE_RADIUS)>=490 && (object_y + DOODLE_RADIUS)<=500)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=374 && (object_x + DOODLE_RADIUS)<=438 && (object_y + DOODLE_RADIUS)>=145 && (object_y + DOODLE_RADIUS)<=155)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=256 && (object_x + DOODLE_RADIUS)<=320 && (object_y + DOODLE_RADIUS)>=470 && (object_y + DOODLE_RADIUS)<=480)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=256 && (object_x + DOODLE_RADIUS)<=320 && (object_y + DOODLE_RADIUS)>=200 && (object_y + DOODLE_RADIUS)<=210)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x + DOODLE_RADIUS)<=664 && (object_y + DOODLE_RADIUS)>=490 && (object_y + DOODLE_RADIUS)<=500)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x + DOODLE_RADIUS)<=664 && (object_y + DOODLE_RADIUS)>=330 && (object_y + DOODLE_RADIUS)<=340)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x + DOODLE_RADIUS)<=664 && (object_y + DOODLE_RADIUS)>=145 && (object_y + DOODLE_RADIUS)<=155)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x + DOODLE_RADIUS)<=664 && (object_y + DOODLE_RADIUS)>=72 && (object_y + DOODLE_RADIUS)<=82)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=300 && (object_x + DOODLE_RADIUS)<=364 && (object_y + DOODLE_RADIUS)>=300 && (object_y + DOODLE_RADIUS)<=310)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=200 && (object_x + DOODLE_RADIUS)<=264 && (object_y + DOODLE_RADIUS)>=330 && (object_y + DOODLE_RADIUS)<=340)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=200 && (object_x + DOODLE_RADIUS)<=264 && (object_y + DOODLE_RADIUS)>=100 && (object_y + DOODLE_RADIUS)<=110)
+                            state <= UP;
+                        else if ((object_x + DOODLE_RADIUS)>=400 && (object_x + DOODLE_RADIUS)<=464 && (object_y + DOODLE_RADIUS)>=360 && (object_y + DOODLE_RADIUS)<=370)
                             state <= UP;
                         else
                         begin
