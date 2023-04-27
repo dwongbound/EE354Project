@@ -1,7 +1,7 @@
 from PIL import Image
 
 # Load the sprite image
-sprite_img = Image.open("./revised_game_over.png")
+sprite_img = Image.open("./title.png")
 
 # Get the dimensions of the sprite
 width, height = sprite_img.size

@@ -37,6 +37,7 @@ module doodle_sm(
     // Temp variables
     reg [9:0] temp_v_counter;
     reg [15:0] temp_score;
+    reg [15:0] fall_time = 0;
 
     always @ (posedge Clk, posedge Reset)
     begin
@@ -45,6 +46,7 @@ module doodle_sm(
                 state <= I;
                 is_in_middle <= 1'b0;
                 temp_v_counter <= 0;
+                fall_time <= 0;
             end
         else begin
             case(state)
@@ -55,6 +57,7 @@ module doodle_sm(
                     end
                 UP:
                     begin
+                        fall_time <= 0;
                         if (up_count >= JUMP_HEIGHT)
                             state <= DOWN;
 
@@ -70,7 +73,9 @@ module doodle_sm(
                 
                 DOWN:
                     begin
-                        if (((true_y[15] == v_counter[15]) && (true_y > 515 - v_counter))) // If doodle is below the bottom of the screen he's dead
+                        fall_time <= fall_time + vert_speed;
+                        // if (((true_y[15] == v_counter[15]) && (true_y > 515 - v_counter))) // If doodle is below the bottom of the screen he's dead
+                        if (fall_time >= (H_RES - 100))   
                             state <= DONE;
                         // B1
                         else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(208-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(208+PLAT_RADIUS_H+v_counter))
@@ -106,7 +111,7 @@ module doodle_sm(
                         else if ((object_x+DOODLE_RADIUS)>=(180-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(180+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(20-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(20+PLAT_RADIUS_H+v_counter)) // 180, 20
                             state <= UP;
                         // B13
-                        else if ((object_x+DOODLE_RADIUS)>=(444-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(444+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(65530-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(65530+PLAT_RADIUS_H+v_counter)) // 444, 65530
+                        else if ((object_x+DOODLE_RADIUS)>=(444-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(444+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=((-100)-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=((-100)+PLAT_RADIUS_H+v_counter)) // 444, -100
                             state <= UP;
                     end
                 
