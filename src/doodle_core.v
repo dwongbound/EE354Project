@@ -52,8 +52,7 @@ module doodle_sm(
                 i_score <= 8'bx;
                 is_in_middle <= 1'b0;
             end
-        else
-        begin
+        else begin
             case(state)
                 I:
                     begin
@@ -78,7 +77,9 @@ module doodle_sm(
                 
                 DOWN:
                     begin
-                        if ( (object_x + DOODLE_RADIUS)>=374 && (object_x + DOODLE_RADIUS)<=438 && (object_y + DOODLE_RADIUS)>=490 && (object_y + DOODLE_RADIUS)<=500)
+                        if ((object_y + DOODLE_RADIUS) > 515) // Doodle reached the bottom of the stage
+                                state <= DONE;
+                        else if ( (object_x + DOODLE_RADIUS)>=374 && (object_x + DOODLE_RADIUS)<=438 && (object_y + DOODLE_RADIUS)>=490 && (object_y + DOODLE_RADIUS)<=500)
                             state <= UP;
                         else if ((object_x + DOODLE_RADIUS)>=374 && (object_x + DOODLE_RADIUS)<=438 && (object_y + DOODLE_RADIUS)>=145 && (object_y + DOODLE_RADIUS)<=155)
                             state <= UP;
@@ -102,11 +103,6 @@ module doodle_sm(
                             state <= UP;
                         else if ((object_x + DOODLE_RADIUS)>=400 && (object_x + DOODLE_RADIUS)<=464 && (object_y + DOODLE_RADIUS)>=360 && (object_y + DOODLE_RADIUS)<=370)
                             state <= UP;
-                        else
-                        begin
-                            if ((object_y + DOODLE_RADIUS) > 515) // Doodle reached the bottom of the stage
-                                state <= DONE;
-                        end
                     end
                 
                 DONE:
