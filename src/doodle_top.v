@@ -89,7 +89,8 @@ module doodle_top(
 	reg[9:0] JUMP_HEIGHT = 127;
 	wire [9:0] xpos, ypos;
 	wire [9:0] up_count;
-	wire [9:0] v_counter; // keep track of screen scrolling as doodle jumps up
+	wire [15:0] v_counter; // keep track of screen scrolling as doodle jumps up
+	wire [3:0] vert_speed; // how many pixels doodle is moving per clock
 
 	// Clock management
 	always @(posedge ClkPort, posedge Reset) 	
@@ -125,7 +126,10 @@ module doodle_top(
 		.hCount(hc), .vCount(vc),
 		.pixel_x(pixel_x), .pixel_y(pixel_y),
 		.object_x(xpos), .object_y(ypos), // xpos and ypos is updated in vga_controller, then passed to core design.
-		.is_in_middle(is_in_middle)
+		.is_in_middle(is_in_middle),
+		.vert_speed(vert_speed),
+		.v_counter(v_counter),
+		.score(score)
 	);
 
 	// Generates 4MHz clock for spi master
@@ -148,8 +152,9 @@ module doodle_top(
 		.xpos(xpos), .ypos(ypos),
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
 		.up_count(up_count),
-		.score(score),
-		.JUMP_HEIGHT(JUMP_HEIGHT)
+		.vert_speed(vert_speed),
+		.JUMP_HEIGHT(JUMP_HEIGHT),
+		.is_in_middle(is_in_middle)
 	);
 
 	// Controls accelerometer data
@@ -191,7 +196,7 @@ module doodle_top(
 	/* Use LEDs to see which state we're in and which side we are tilting */
 	// Using right 4 to indicate tilt right, left 4 to indicate tilt left, and middle four to indicate state.
 	// Note left leds are flipped on purpose to make it more symmetrical
-	assign {Ld12, Ld13, Ld14, Ld15, Ld11, Ld9, Ld8, Ld7, Ld6, Ld3, Ld2, Ld1, Ld0} = {left_leds, Start_Ack_Pulse, q_I, q_Up, q_Down, q_Done, right_leds};
+	assign {Ld12, Ld13, Ld14, Ld15, Ld11, Ld9, Ld8, Ld7, Ld6, Ld4, Ld3, Ld2, Ld1, Ld0} = {left_leds, Start_Ack_Pulse, q_I, q_Up, q_Down, q_Done, is_in_middle, right_leds};
 
 
 	// SSD Parameters

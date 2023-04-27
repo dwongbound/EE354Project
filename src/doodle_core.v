@@ -8,9 +8,11 @@ module doodle_sm(
     output q_I, q_Up, q_Down, q_Done,
     input [9:0] hCount, vCount,
     input [7:0] pixel_x, pixel_y, // pixel_x and pixel_y represent the current pixel being displayed on the screen.
-    input [9:0] object_x, object_y, // object_x and object_y represent the position of the object being checked
+    input [15:0] object_x, object_y, // object_x and object_y represent the position of the object being checked
     output reg is_in_middle,
-    output [9:0] v_counter // How many pixels we've scrolled. Defaults to 0
+    output [15:0] v_counter, // How many pixels we've scrolled. Defaults to 0
+    input [3:0] vert_speed,
+    output [15:0] score
 );
     // State variables
     reg [3:0] state;
@@ -32,6 +34,7 @@ module doodle_sm(
 
     // Temp variables
     reg [9:0] temp_v_counter;
+    reg [15:0] temp_score;
 
     always @ (posedge Clk, posedge Reset)
     begin
@@ -52,17 +55,21 @@ module doodle_sm(
                     begin
                         if (up_count >= JUMP_HEIGHT)
                             state <= DOWN;
+                        else
+                            temp_score <= score + vert_speed;
 
-                        // if (object_y >= V_MIDDLE)  
-                        //     is_in_middle <= 1;
-                        // else 
-                        //     is_in_middle <= 0;
+                        if (object_y <= V_MIDDLE) begin
+                            is_in_middle <= 1;
+                            temp_v_counter <= v_counter + vert_speed;
+                        end
+                        else 
+                            is_in_middle <= 0;
 
                     end
                 
                 DOWN:
                     begin
-                        if ((object_y + DOODLE_RADIUS) > 515) // Doodle reached the bottom of the stage
+                        if ((object_y + DOODLE_RADIUS) > 515 - v_counter) // Doodle reached the bottom of the stage
                                 state <= DONE;
                         // B1
                         else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(208-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(208+PLAT_RADIUS_H+v_counter))
@@ -109,22 +116,9 @@ module doodle_sm(
 
     end
 
-    // Might need to put 
-
-    always @ (posedge Clk)
-    begin
-        if (is_in_middle==1'b1) 
-        begin
-            if (v_counter <= JUMP_HEIGHT)
-            begin
-                temp_v_counter <= v_counter + 1;
-            end
-        end
-        else 
-            temp_v_counter <= 10'b0000000000;
-    end
 
     // assign temp values
     assign v_counter = temp_v_counter;
+    assign score = temp_score;
 
 endmodule

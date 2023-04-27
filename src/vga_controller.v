@@ -7,14 +7,15 @@ module vga_controller(
 	input up, down, left, right,
 	input [9:0] hCount, vCount, // Is iterated through the screen pixel by pixel to show content
 	output reg [11:0] rgb,
-	input v_counter,
+	input [15:0] v_counter,
 	input [4:0] tilt_intensity, // this only goes from 1 to 8
 	// these two values dictate the center of the doodle, incrementing and decrementing them leads the block to move in certain directions
 	output [9:0] xpos, ypos,
 	input q_Done, q_I, q_Up, q_Down,
 	output [7:0] up_count,
-	output [15:0] score,
-	input [9:0] JUMP_HEIGHT
+	output [3:0] vert_speed, // how many pixels it moves up or down per clock
+	input [9:0] JUMP_HEIGHT,
+	input is_in_middle
 );
 
     // Temp size of doodle's radius
@@ -27,13 +28,11 @@ module vga_controller(
     
 	// Temp variable used to calculate location of filled block
 	wire block_fill;
-	// Speed it goes up
-	reg [3:0] vert_speed = 0;
 
 	// Temp vars
 	reg [9:0] temp_x = 406, temp_y = 477;
 	reg [7:0] temp_up_count = 0; // To count how many pixels it went up
-	reg [15:0] temp_score = 0;
+	reg [3:0] temp_vert_speed = 0;
 
 	// Const color values
 	parameter BLACK = 12'b0000_0000_0000;
@@ -278,22 +277,21 @@ module vga_controller(
 			temp_x <= 406;
 			temp_y <= 477;
 			temp_up_count <= 0; // default
-			temp_score <= 0;
-			vert_speed <= 0;
+			temp_vert_speed <= 0;
 			down_flag <= 0;
 		end
 		else if (clk) begin
 			// Update acceleration
-			if (temp_up_count <= 13) vert_speed <= 4;
-			else if (temp_up_count > 13 && temp_up_count <= 26) vert_speed <= 4;
-			else if (temp_up_count > 26 && temp_up_count <= 39) vert_speed <= 3;
-			else if (temp_up_count > 39 && temp_up_count <= 52) vert_speed <= 3;
-			else if (temp_up_count > 52 && temp_up_count <= 65) vert_speed <= 3;
-			else if (temp_up_count > 65 && temp_up_count <= 78) vert_speed <= 2;
-			else if (temp_up_count > 78 && temp_up_count <= 91) vert_speed <= 2;
-			else if (temp_up_count > 91 && temp_up_count <= 104) vert_speed <= 2;
-			else if (temp_up_count > 104 && temp_up_count <= 117) vert_speed <= 1;
-			else if (temp_up_count > 124) vert_speed <= 1;
+			if (temp_up_count <= 13) temp_vert_speed <= 4;
+			else if (temp_up_count > 13 && temp_up_count <= 26) temp_vert_speed <= 4;
+			else if (temp_up_count > 26 && temp_up_count <= 39) temp_vert_speed <= 3;
+			else if (temp_up_count > 39 && temp_up_count <= 52) temp_vert_speed <= 3;
+			else if (temp_up_count > 52 && temp_up_count <= 65) temp_vert_speed <= 3;
+			else if (temp_up_count > 65 && temp_up_count <= 78) temp_vert_speed <= 2;
+			else if (temp_up_count > 78 && temp_up_count <= 91) temp_vert_speed <= 2;
+			else if (temp_up_count > 91 && temp_up_count <= 104) temp_vert_speed <= 2;
+			else if (temp_up_count > 104 && temp_up_count <= 117) temp_vert_speed <= 1;
+			else if (temp_up_count > 124) temp_vert_speed <= 1;
 
 			/* Note that the top left of the screen does NOT correlate to vCount=0 and hCount=0. The display_controller.v file has the 
 				synchronizing pulses for both the horizontal sync and the vertical sync begin at vcount=0 and hcount=0. Recall that after 
@@ -314,9 +312,10 @@ module vga_controller(
 					temp_x <= 774;
 			end
 			if (q_Up) begin // Second or for debugging
-				temp_y <= temp_y - vert_speed;
-				if (q_Up)
-					temp_score <= temp_score + vert_speed;
+				// Doodle should only move if he is below the middle of the screen
+				// If he's past the middle, everything else should move
+				if (is_in_middle == 0)
+					temp_y <= temp_y - vert_speed;
 				temp_up_count <= temp_up_count + vert_speed;
 				if (down_flag)
 					temp_up_count <= 0;
@@ -395,7 +394,6 @@ module vga_controller(
 	assign xpos = temp_x;
 	assign ypos = temp_y;
 	assign up_count = temp_up_count;
-	assign score = temp_score;
-	assign up_speed = vert_speed;
+	assign vert_speed = temp_vert_speed;
 	
 endmodule
