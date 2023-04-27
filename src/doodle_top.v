@@ -50,13 +50,10 @@ module doodle_top(
 	wire [7:0] pixel_x, pixel_y;
 	wire object_x, object_y;
 	wire is_in_middle;
-	wire[15:0] score;
+	wire[9:0] score;
 	wire [6:0] ssdOut;
 	wire [3:0] anode;
 	wire [11:0] rgb;
-
-	//vga_bitchange vbc(.clk(ClkPort), .bright(bright), .button(BtnU), .hCount(hc), .vCount(vc), .rgb(rgb), .score(score));
-	//counter cnt(.clk(ClkPort), .displayNumber(score), .anode(anode), .ssdOut(ssdOut));
 
 	assign vgaR = rgb[11 : 8];
 	assign vgaG = rgb[7  : 4];
@@ -91,7 +88,7 @@ module doodle_top(
 	// Related to doodle itself
 	reg[9:0] JUMP_HEIGHT = 127;
 	wire [9:0] xpos, ypos;
-	wire [9:0] up_count, i_score;
+	wire [9:0] up_count;
 
 	// Clock management
 	always @(posedge ClkPort, posedge Reset) 	
@@ -124,7 +121,7 @@ module doodle_top(
 		.Ack(Start_Ack_Pulse),
 		.JUMP_HEIGHT(JUMP_HEIGHT),
 		.up_count(up_count),
-		.i_score(i_score),
+		.score(score),
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
 		.hCount(hc), .vCount(vc),
 		.pixel_x(pixel_x), .pixel_y(pixel_y),
@@ -204,8 +201,8 @@ module doodle_top(
 	assign SSD3 = {2'b00, xpos[9:8]};
 	assign SSD4 = xpos[7:4];
 	assign SSD5 = xpos[3:0];
-	assign SSS6 = i_score[7:4];
-	assign SSD7 = i_score[3:0];
+	assign SSS6 = score[7:4];
+	assign SSD7 = score[3:0];
 
 	assign ssdscan_clk = DIV_CLK[19:17];
 	assign An0	= !((ssdscan_clk[2]) && (ssdscan_clk[1]) && (ssdscan_clk[0]));  // when ssdscan_clk = 000
