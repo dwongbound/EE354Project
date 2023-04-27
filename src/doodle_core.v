@@ -35,6 +35,7 @@ module doodle_sm(
     // Temp variables
     reg [9:0] temp_v_counter;
     reg [15:0] temp_score;
+    reg [9:0] current_fall; // How many pixels doodle has been falling used to move to done state.
 
     always @ (posedge Clk, posedge Reset)
     begin
@@ -50,26 +51,28 @@ module doodle_sm(
                     begin
                         if (Start)
                             state <= UP;
+                            current_fall <= 0;
                     end
                 UP:
                     begin
+                        current_fall <= 0;
                         if (up_count >= JUMP_HEIGHT)
                             state <= DOWN;
 
                         if (object_y <= V_MIDDLE) begin
                             is_in_middle <= 1;
                             temp_v_counter <= v_counter + vert_speed;
-                            temp_score <= vert_speed;
+                            temp_score <= temp_score + vert_speed;
                         end
                         else 
                             is_in_middle <= 0;
                         // Account for y shrinking
-
                     end
                 
                 DOWN:
                     begin
-                        if ((object_y + DOODLE_RADIUS) > 515 - v_counter) // Doodle reached the bottom of the stage
+                        current_fall <= current_fall + vert_speed; // Keep track of how many pixels we've fallen
+                        if (current_fall >= V_RES) // If doodle has fallen one screen length, he's dead
                                 state <= DONE;
                         // B1
                         else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(208-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(208+PLAT_RADIUS_H+v_counter))
@@ -100,6 +103,12 @@ module doodle_sm(
                             state <= UP;
                         // B11
                         else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(80-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(80+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B12
+                        else if ((object_x+DOODLE_RADIUS)>=(180-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(180+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(180-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(180+PLAT_RADIUS_H+v_counter)) // 180, 180
+                            state <= UP;
+                        // B13
+                        else if ((object_x+DOODLE_RADIUS)>=(444-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(444+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(100-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(100+PLAT_RADIUS_H+v_counter)) // 444, 100
                             state <= UP;
                     end
                 

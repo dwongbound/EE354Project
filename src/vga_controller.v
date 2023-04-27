@@ -10,7 +10,7 @@ module vga_controller(
 	input [15:0] v_counter,
 	input [4:0] tilt_intensity, // this only goes from 1 to 8
 	// these two values dictate the center of the doodle, incrementing and decrementing them leads the block to move in certain directions
-	output [9:0] xpos, ypos,
+	output [15:0] xpos, ypos,
 	input q_Done, q_I, q_Up, q_Down,
 	output [7:0] up_count,
 	output [3:0] vert_speed, // how many pixels it moves up or down per clock
@@ -30,7 +30,7 @@ module vga_controller(
 	wire block_fill;
 
 	// Temp vars
-	reg [9:0] temp_x = 406, temp_y = 477;
+	reg [15:0] temp_x = 406, temp_y = 477;
 	reg [7:0] temp_up_count = 0; // To count how many pixels it went up
 	reg [3:0] temp_vert_speed = 0;
 
@@ -367,6 +367,10 @@ module vga_controller(
 			rgb = platform[vCount+PLAT_RADIUS_H-368-v_counter][hCount+PLAT_RADIUS_W-432];
 		else if (B11==1) // 632, 80
 			rgb = platform[vCount+PLAT_RADIUS_H-80-v_counter][hCount+PLAT_RADIUS_W-632];
+		else if (B12==1) // 180, 180
+			rgb = platform[vCount+PLAT_RADIUS_H-180-v_counter][hCount+PLAT_RADIUS_W-180];
+		else if (B13==1) // 444, 100
+			rgb = platform[vCount+PLAT_RADIUS_H-100-v_counter][hCount+PLAT_RADIUS_W-444];
 		// Doodle 
 		else if (block_fill)
 			if (last_direction == 1)
@@ -389,6 +393,8 @@ module vga_controller(
 	assign B9 = (hCount >= (338-PLAT_RADIUS_W) && hCount <= (338+PLAT_RADIUS_W)) && (vCount>=(308-PLAT_RADIUS_H+v_counter) && vCount<=(308+PLAT_RADIUS_H+v_counter));
 	assign B10 = (hCount >= (432-PLAT_RADIUS_W) && hCount <= (432+PLAT_RADIUS_W)) && (vCount>=(368-PLAT_RADIUS_H+v_counter) && vCount<=(368+PLAT_RADIUS_H+v_counter));
 	assign B11 = (hCount >= (632-PLAT_RADIUS_W) && hCount <= (632+PLAT_RADIUS_W)) && (vCount>=(80-PLAT_RADIUS_H+v_counter) && vCount<=(80+PLAT_RADIUS_H+v_counter));
+	assign B12 = (hCount >= (180-PLAT_RADIUS_W) && hCount <= (180+PLAT_RADIUS_W)) && (vCount>=(180-PLAT_RADIUS_H+v_counter) && vCount<=(180+PLAT_RADIUS_H+v_counter));
+	assign B13 = (hCount >= (444-PLAT_RADIUS_W) && hCount <= (444+PLAT_RADIUS_W)) && (vCount>=(100-PLAT_RADIUS_H+v_counter) && vCount<=(100+PLAT_RADIUS_H+v_counter));
 	
 	// Assign temp vars to outputs
 	assign xpos = temp_x;

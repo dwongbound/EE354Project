@@ -87,7 +87,7 @@ module doodle_top(
 
 	// Related to doodle itself
 	reg[9:0] JUMP_HEIGHT = 127;
-	wire [9:0] xpos, ypos;
+	wire [15:0] xpos, ypos;
 	wire [9:0] up_count;
 	wire [15:0] v_counter; // keep track of screen scrolling as doodle jumps up
 	wire [3:0] vert_speed; // how many pixels doodle is moving per clock
@@ -201,12 +201,12 @@ module doodle_top(
 
 	// SSD Parameters
 	// SSDs go left to right, so SSD0 is on the left and SSD7 is on the right
-	assign SSD0 = {2'b00, ypos[9:8]};
-	assign SSD1 = ypos[7:4];
-	assign SSD2 = ypos[3:0];
-	assign SSD3 = {2'b00, xpos[9:8]};
-	assign SSD4 = xpos[7:4];
-	assign SSD5 = xpos[3:0];
+	assign SSD0 = ypos[15:12];
+	assign SSD1 = ypos[11:8];
+	assign SSD2 = ypos[7:4];
+	assign SSD3 = ypos[3:0];
+	assign SSD4 = score[15:12];
+	assign SSD5 = score[11:8];
 	assign SSS6 = score[7:4];
 	assign SSD7 = score[3:0];
 
