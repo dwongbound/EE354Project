@@ -10,7 +10,7 @@ module doodle_sm(
     input [7:0] pixel_x, pixel_y, // pixel_x and pixel_y represent the current pixel being displayed on the screen.
     input [9:0] object_x, object_y, // object_x and object_y represent the position of the object being checked
     output reg is_in_middle,
-    output reg[9:0] v_counter // How many pixels we've scrolled. Defaults to 0
+    output [9:0] v_counter // How many pixels we've scrolled. Defaults to 0
 );
     // State variables
     reg [3:0] state;
@@ -19,6 +19,8 @@ module doodle_sm(
 
     // Doodle's pixel size
     localparam DOODLE_RADIUS = 13; // from middle to bottom edge
+    localparam PLAT_RADIUS_W = 32; // Width radius of platform
+	localparam PLAT_RADIUS_H = 7; // Height radius of platform
 
     // Obtain the resolution of the screen using the VGA interface module
     parameter H_RES = 630; // Goes from 144 to 774 (right)
@@ -28,19 +30,8 @@ module doodle_sm(
     parameter H_MIDDLE = (H_RES / 2) + 144; // Includes offset
     parameter V_MIDDLE = (V_RES / 2) + 35;  // Includes offset
 
-    // Python image render script
-    // reg [7:0] image_data [0:255][0:255];
-    
-    /*
-    initial begin
-    $readmemb("green.mif", image_data);
-    end
-    */
-
-    //wire [11:0] color_data;
-
-   // Resize_green_rom Resize_green_rom(.clk(Clk),.row(vCount),.col(hCount),.color_data(color_data));
-
+    // Temp variables
+    reg [9:0] temp_v_counter;
 
     always @ (posedge Clk, posedge Reset)
     begin
@@ -48,6 +39,7 @@ module doodle_sm(
             begin
                 state <= I;
                 is_in_middle <= 1'b0;
+                temp_v_counter <= 0;
             end
         else begin
             case(state)
@@ -60,47 +52,53 @@ module doodle_sm(
                     begin
                         if (up_count >= JUMP_HEIGHT)
                             state <= DOWN;
-/*
-                        if (object_y >= V_MIDDLE - DOODLE_RADIUS && object_y <= V_MIDDLE + DOODLE_RADIUS)  
-                            is_in_middle <= 1;
-                        else 
-                            is_in_middle <= 0;
- */
+
+                        // if (object_y >= V_MIDDLE)  
+                        //     is_in_middle <= 1;
+                        // else 
+                        //     is_in_middle <= 0;
+
                     end
                 
                 DOWN:
                     begin
                         if ((object_y + DOODLE_RADIUS) > 515) // Doodle reached the bottom of the stage
                                 state <= DONE;
-                        else if ((object_x + DOODLE_RADIUS)>=374 && (object_x - DOODLE_RADIUS)<=438 && (object_y+DOODLE_RADIUS)>=490 && (object_y+DOODLE_RADIUS)<=500)
+                        // B1
+                        else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(208-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(208+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=374 && (object_x - DOODLE_RADIUS)<=438 && (object_y+DOODLE_RADIUS)>=145 && (object_y+DOODLE_RADIUS)<=155)
+                        // B2
+                        else if ((object_x+DOODLE_RADIUS)>=(406-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(406+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(498-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(498+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=256 && (object_x - DOODLE_RADIUS)<=320 && (object_y+DOODLE_RADIUS)>=470 && (object_y+DOODLE_RADIUS)<=480)
+                        // B3
+                        else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(338-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(338+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=256 && (object_x - DOODLE_RADIUS)<=320 && (object_y+DOODLE_RADIUS)>=200 && (object_y+DOODLE_RADIUS)<=210)
+                        // B4
+                        else if ((object_x+DOODLE_RADIUS)>=(232-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(232+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(108-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(108+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x - DOODLE_RADIUS)<=664 && (object_y+DOODLE_RADIUS)>=490 && (object_y+DOODLE_RADIUS)<=500)
+                        // B5
+                        else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(478-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(478+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x - DOODLE_RADIUS)<=664 && (object_y+DOODLE_RADIUS)>=330 && (object_y+DOODLE_RADIUS)<=340)
+                        // B6
+                        else if ((object_x+DOODLE_RADIUS)>=(406-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(406+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(153-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(153+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x - DOODLE_RADIUS)<=664 && (object_y+DOODLE_RADIUS)>=145 && (object_y+DOODLE_RADIUS)<=155)
+                        // B8
+                        else if ((object_x+DOODLE_RADIUS)>=(232-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(232+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(338-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(338+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=600 && (object_x - DOODLE_RADIUS)<=664 && (object_y+DOODLE_RADIUS)>=72 && (object_y+DOODLE_RADIUS)<=82)
+                        // B9
+                        else if ((object_x+DOODLE_RADIUS)>=(338-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(338+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(308-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(308+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=300 && (object_x - DOODLE_RADIUS)<=364 && (object_y+DOODLE_RADIUS)>=300 && (object_y+DOODLE_RADIUS)<=310)
+                        // B10
+                        else if ((object_x+DOODLE_RADIUS)>=(432-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(432+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(368-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(368+PLAT_RADIUS_H+v_counter))
                             state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=200 && (object_x - DOODLE_RADIUS)<=264 && (object_y+DOODLE_RADIUS)>=330 && (object_y+DOODLE_RADIUS)<=340)
-                            state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=200 && (object_x - DOODLE_RADIUS)<=264 && (object_y+DOODLE_RADIUS)>=100 && (object_y+DOODLE_RADIUS)<=110)
-                            state <= UP;
-                        else if ((object_x + DOODLE_RADIUS)>=400 && (object_x - DOODLE_RADIUS)<=464 && (object_y+DOODLE_RADIUS)>=360 && (object_y+DOODLE_RADIUS)<=370)
+                        // B11
+                        else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(80-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(80+PLAT_RADIUS_H+v_counter))
                             state <= UP;
                     end
                 
                 DONE:
                     begin
-                        if (Ack)
+                        if (Reset)
                             state <= I;
                     end
                 
@@ -119,11 +117,14 @@ module doodle_sm(
         begin
             if (v_counter <= JUMP_HEIGHT)
             begin
-                v_counter <= v_counter + 1;
+                temp_v_counter <= v_counter + 1;
             end
         end
         else 
-            v_counter <= 10'b0000000000;
+            temp_v_counter <= 10'b0000000000;
     end
+
+    // assign temp values
+    assign v_counter = temp_v_counter;
 
 endmodule

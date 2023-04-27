@@ -50,7 +50,7 @@ module doodle_top(
 	wire [7:0] pixel_x, pixel_y;
 	wire object_x, object_y;
 	wire is_in_middle;
-	wire[9:0] score;
+	wire [15:0] score;
 	wire [6:0] ssdOut;
 	wire [3:0] anode;
 	wire [11:0] rgb;
@@ -89,6 +89,7 @@ module doodle_top(
 	reg[9:0] JUMP_HEIGHT = 127;
 	wire [9:0] xpos, ypos;
 	wire [9:0] up_count;
+	wire [9:0] v_counter; // keep track of screen scrolling as doodle jumps up
 
 	// Clock management
 	always @(posedge ClkPort, posedge Reset) 	
@@ -104,7 +105,6 @@ module doodle_top(
 	assign col = 6'b0001000;
 	wire move_clk; // Temp variable to capture slower clock
 	assign move_clk = DIV_CLK[19]; //slower clock to drive the movement of objects on the vga screen
-	wire v_counter; // keep track of screen scrolling as doodle jumps up
 
 	display_controller dc(
 		.clk(ClkPort),
@@ -121,7 +121,6 @@ module doodle_top(
 		.Ack(Start_Ack_Pulse),
 		.JUMP_HEIGHT(JUMP_HEIGHT),
 		.up_count(up_count),
-		.score(score),
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
 		.hCount(hc), .vCount(vc),
 		.pixel_x(pixel_x), .pixel_y(pixel_y),
@@ -148,7 +147,9 @@ module doodle_top(
 		.tilt_intensity(tilt_intensity),
 		.xpos(xpos), .ypos(ypos),
 		.q_I(q_I), .q_Up(q_Up), .q_Down(q_Down), .q_Done(q_Done),
-		.up_count(up_count)
+		.up_count(up_count),
+		.score(score),
+		.JUMP_HEIGHT(JUMP_HEIGHT)
 	);
 
 	// Controls accelerometer data

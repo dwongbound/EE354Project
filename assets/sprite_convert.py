@@ -1,7 +1,7 @@
 from PIL import Image
 
 # Load the sprite image
-sprite_img = Image.open("./doodle_left.png")
+sprite_img = Image.open("./revised_game_over.png")
 
 # Get the dimensions of the sprite
 width, height = sprite_img.size
@@ -24,6 +24,6 @@ with open('./output.txt', 'w') as out:
         out.write('}')
         if y != height - 1:
             out.write(',\n')
-    out.write('}\n')
+    out.write('};\n')
 
     out.write(f"Width: {width}, Height: {height}")
