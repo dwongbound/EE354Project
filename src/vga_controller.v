@@ -81,7 +81,7 @@ module vga_controller(
 			rgb = RED;
 		else if (block_fill)
 			rgb = RED;
-		else if (B1 == 1 || B2 ==1 || B3==1 || B4==1 || B5==1 || B6==1 ||  B7==1 || B8==1 || B9==1 || B10==1|| B11==1 || B12==1)
+		else if (B1==1 || B2 ==1 || B3==1 || B4==1 || B5==1 || B6==1 || B7==1 || B8==1 || B9==1 || B10==1 || B11==1 || B12==1)
 			rgb = GREEN;
 		else
 			rgb = BLACK; // background color
@@ -90,7 +90,8 @@ module vga_controller(
     assign B2 = (hCount>=374 && hCount <= 438) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
     assign B3 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
     assign B4 = (hCount>=200 && hCount <= 264) && (vCount>=(v_counter+100) && vCount<=(v_counter+116));
-    assign B5 = (hCount>= 256 && hCount <= 320) && (vCount>=(v_counter+450) && vCount<=(v_counter+466));
+    assign B5 = (hCount>= 256 && hCount <= 320) && (vCount>=(470) && vCount<=(486));
+    assign B9 = (hCount>=300 && hCount <= 364) && (vCount>=(v_counter+300) && vCount<=(v_counter+316));
     assign B6 = (hCount>=374 && hCount <= 438) && (vCount>=(v_counter+145) && vCount<=(v_counter+161));
     assign B7 = (hCount>=600 && hCount <= 664) && (vCount>=(v_counter+145) && vCount<=(v_counter+161));
     assign B8 = (hCount>=200 && hCount <= 264) && (vCount>=(v_counter+330) && vCount<=(v_counter+346));
@@ -98,7 +99,6 @@ module vga_controller(
     assign B10 = (hCount>=400 && hCount<=464) && (vCount>=(v_counter + 330) && vCount <= (v_counter + 346));
     assign B11 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+72) && vCount<=(v_counter+88));
     assign B12 = (hCount>=600 && hCount <=664) && (vCount>=(v_counter+490) && vCount<=(v_counter+506));
-	
 	// Assign temp vars to outputs
 	assign xpos = temp_x;
 	assign ypos = temp_y;

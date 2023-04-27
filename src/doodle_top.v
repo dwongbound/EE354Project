@@ -89,9 +89,9 @@ module doodle_top(
 	assign parse_left = (~(acl_data[9]) && ((acl_data[8]) || (acl_data[7]) || (acl_data[6]) || (acl_data[5])));
 
 	// Related to doodle itself
-	parameter JUMP_HEIGHT = 250;
+	reg[9:0] JUMP_HEIGHT = 127;
 	wire [9:0] xpos, ypos;
-	wire [7:0] up_count, i_score;
+	wire [9:0] up_count, i_score;
 
 	// Clock management
 	always @(posedge ClkPort, posedge Reset) 	

@@ -2,10 +2,10 @@
 
 module doodle_sm(
     input Clk, Reset, Start, Ack,
-    input JUMP_HEIGHT,
+    input[9:0] JUMP_HEIGHT,
     // up_count represents the current distance that the doodle has jumped. Generated in vga_controller
     // i_score represents the current score. It should be the sum of all pixels doodle has jumped.
-    input [7:0] up_count, 
+    input [9:0] up_count, 
     output reg[7:0] i_score,
     output q_I, q_Up, q_Down, q_Done,
     input [9:0] hCount, vCount,
@@ -68,17 +68,24 @@ module doodle_sm(
                         else begin
                             i_score <= i_score + 1;
                         end
-
+/*
                         if (object_y >= V_MIDDLE - DOODLE_RADIUS && object_y <= V_MIDDLE + DOODLE_RADIUS)  
                             is_in_middle <= 1;
                         else 
                             is_in_middle <= 0;
+ */
                     end
                 
                 DOWN:
                     begin 
-                        if (((object_x+DOODLE_RADIUS)>= 256 && (object_x+DOODLE_RADIUS) <= 320) && ((object_y+DOODLE_RADIUS)>=(v_counter+200) && (object_y+DOODLE_RADIUS)<=(v_counter+216)) ||
-                            ((object_x+DOODLE_RADIUS)>=374 && (object_x+DOODLE_RADIUS) <= 438) && ((object_y+DOODLE_RADIUS)>=(v_counter+490) && (object_y+DOODLE_RADIUS)<=(v_counter+506)))
+                        if (((object_x+DOODLE_RADIUS)>= 374 && (object_x+DOODLE_RADIUS) <= 438) || 
+                            ((object_x+DOODLE_RADIUS)>=256 && (object_x+DOODLE_RADIUS)<=320) || 
+                            ((object_x+DOODLE_RADIUS)>=300 && (object_x+DOODLE_RADIUS)<=364) || 
+                            ((object_x+DOODLE_RADIUS)>=600 && (object_x+DOODLE_RADIUS)<=664) || 
+                            ((object_x+DOODLE_RADIUS)>=200 && (object_x+DOODLE_RADIUS)<=264) || 
+                            ((object_x+DOODLE_RADIUS)>=400 && (object_x+DOODLE_RADIUS)<=464))
+                            //(((object_x+DOODLE_RADIUS)>= 256 && (object_x+DOODLE_RADIUS) <= 320) && ((object_y+DOODLE_RADIUS)>=(v_counter+200) && (object_y+DOODLE_RADIUS)<=(v_counter+216)) ||
+                           // ((object_x+DOODLE_RADIUS)>=374 && (object_x+DOODLE_RADIUS) <= 438) && ((object_y+DOODLE_RADIUS)>=(v_counter+490) && (object_y+DOODLE_RADIUS)<=(v_counter+506)))
                             // ((object_x+DOODLE_RADIUS)>=600 && (object_x+DOODLE_RADIUS) <= 664) && ((object_y+DOODLE_RADIUS)>=(v_counter+330) && (object_y+DOODLE_RADIUS)<=(v_counter+346)) ||
                             // ((object_x+DOODLE_RADIUS)>=200 && (object_x+DOODLE_RADIUS) <= 264) && ((object_y+DOODLE_RADIUS)>=(v_counter+100) && (object_y+DOODLE_RADIUS)<=(v_counter+116)) ||
                             // ((object_x+DOODLE_RADIUS)>= 256 && (object_x+DOODLE_RADIUS) <= 320) && ((object_y+DOODLE_RADIUS)>=(v_counter+450) && (object_y+DOODLE_RADIUS)<=(v_counter+466)) ||
