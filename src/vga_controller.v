@@ -10,7 +10,7 @@ module vga_controller(
 	input [15:0] v_counter,
 	input [4:0] tilt_intensity, // this only goes from 1 to 8
 	// these two values dictate the center of the doodle, incrementing and decrementing them leads the block to move in certain directions
-	output [9:0] xpos, ypos,
+	output [15:0] xpos, ypos,
 	input q_Done, q_I, q_Up, q_Down,
 	output [7:0] up_count,
 	output [3:0] vert_speed, // how many pixels it moves up or down per clock
@@ -367,6 +367,51 @@ module vga_controller(
 			rgb = platform[vCount+PLAT_RADIUS_H-368-v_counter][hCount+PLAT_RADIUS_W-432];
 		else if (B11==1) // 632, 80
 			rgb = platform[vCount+PLAT_RADIUS_H-80-v_counter][hCount+PLAT_RADIUS_W-632];
+	    else if (B12==1) // 182, 50
+			rgb = platform[vCount+PLAT_RADIUS_H-50-v_counter][hCount+PLAT_RADIUS_W-182];
+		else if (B13==1) // 500, 108
+			rgb = platform[vCount+PLAT_RADIUS_H-108-v_counter][hCount+PLAT_RADIUS_W-500];
+		else if (B14==1) // 288, -100
+			rgb = platform[vCount+PLAT_RADIUS_H+100-v_counter][hCount+PLAT_RADIUS_W-288];
+		else if (B15==1) // 600, 40
+			rgb = platform[vCount+PLAT_RADIUS_H-40-v_counter][hCount+PLAT_RADIUS_W-600];
+		else if (B16==1) // 338, 20
+			rgb = platform[vCount+PLAT_RADIUS_H-20-v_counter][hCount+PLAT_RADIUS_W-338];
+		else if (B17==1) // 406, -220
+			rgb = platform[vCount+PLAT_RADIUS_H+220-v_counter][hCount+PLAT_RADIUS_W-406];
+		else if (B18==1) // 632, -330
+			rgb = platform[vCount+PLAT_RADIUS_H+330-v_counter][hCount+PLAT_RADIUS_W-632];
+		else if (B19==1) // 232, -444
+			rgb = platform[vCount+PLAT_RADIUS_H+444-v_counter][hCount+PLAT_RADIUS_W-232];
+		else if (B20==1) // 600, -100
+			rgb = platform[vCount+PLAT_RADIUS_H+100-v_counter][hCount+PLAT_RADIUS_W-600];
+		/*
+		else if (B21==1) // 500, -1675
+			rgb = platform[vCount+PLAT_RADIUS_H+1675-v_counter][hCount+PLAT_RADIUS_W-500];
+		else if (B22==1) // 632, -500
+			rgb = platform[vCount+PLAT_RADIUS_H+500-v_counter][hCount+PLAT_RADIUS_W-500];
+		else if (B23==1) // 182, -600
+			rgb = platform[vCount+PLAT_RADIUS_H+600-v_counter][hCount+PLAT_RADIUS_W-182];
+		else if (B24==1) // 500, -710
+			rgb = platform[vCount+PLAT_RADIUS_H+710-v_counter][hCount+PLAT_RADIUS_W-500];
+		else if (B25==1) // 288, -810
+			rgb = platform[vCount+PLAT_RADIUS_H+810-v_counter][hCount+PLAT_RADIUS_W-288];
+		else if (B26==1) // 600, -900
+			rgb = platform[vCount+PLAT_RADIUS_H+900-v_counter][hCount+PLAT_RADIUS_W-600];
+		else if (B27==1) // 338, -1010
+			rgb = platform[vCount+PLAT_RADIUS_H+1010-v_counter][hCount+PLAT_RADIUS_W-338];
+		else if (B28==1) // 406, -1110
+			rgb = platform[vCount+PLAT_RADIUS_H+1110-v_counter][hCount+PLAT_RADIUS_W-406];
+		else if (B29==1) // 632, -1225
+			rgb = platform[vCount+PLAT_RADIUS_H+1225-v_counter][hCount+PLAT_RADIUS_W-632];
+		else if (B30==1) // 232, 1335
+			rgb = platform[vCount+PLAT_RADIUS_H+1335-v_counter][hCount+PLAT_RADIUS_W-232];
+		else if (B31==1) // 600, -1440
+			rgb = platform[vCount+PLAT_RADIUS_H+1440-v_counter][hCount+PLAT_RADIUS_W-600];
+		else if (B32==1) // 500, -1560
+			rgb = platform[vCount+PLAT_RADIUS_H+1560-v_counter][hCount+PLAT_RADIUS_W-500];
+		*/ 
+		
 		// Doodle 
 		else if (block_fill)
 			if (last_direction == 1)
@@ -389,6 +434,29 @@ module vga_controller(
 	assign B9 = (hCount >= (338-PLAT_RADIUS_W) && hCount <= (338+PLAT_RADIUS_W)) && (vCount>=(308-PLAT_RADIUS_H+v_counter) && vCount<=(308+PLAT_RADIUS_H+v_counter));
 	assign B10 = (hCount >= (432-PLAT_RADIUS_W) && hCount <= (432+PLAT_RADIUS_W)) && (vCount>=(368-PLAT_RADIUS_H+v_counter) && vCount<=(368+PLAT_RADIUS_H+v_counter));
 	assign B11 = (hCount >= (632-PLAT_RADIUS_W) && hCount <= (632+PLAT_RADIUS_W)) && (vCount>=(80-PLAT_RADIUS_H+v_counter) && vCount<=(80+PLAT_RADIUS_H+v_counter));
+	assign B12 = (hCount >= (182-PLAT_RADIUS_W) && hCount <= (182+PLAT_RADIUS_W)) && (vCount>=(50-PLAT_RADIUS_H+v_counter) && vCount<=(50+PLAT_RADIUS_H+v_counter));
+	assign B13 = (hCount >= (500-PLAT_RADIUS_W) && hCount <= (500+PLAT_RADIUS_W)) && (vCount>=(108-PLAT_RADIUS_H+v_counter) && vCount<=(108+PLAT_RADIUS_H+v_counter));
+	assign B14 = (hCount >= (288-PLAT_RADIUS_W) && hCount <= (288+PLAT_RADIUS_W)) && (vCount>=(-100-PLAT_RADIUS_H+v_counter) && vCount<=(-100+PLAT_RADIUS_H+v_counter));
+	assign B15 = (hCount >= (600-PLAT_RADIUS_W) && hCount <= (600+PLAT_RADIUS_W)) && (vCount>=(40-PLAT_RADIUS_H+v_counter) && vCount<=(40+PLAT_RADIUS_H+v_counter));
+	assign B16 = (hCount >= (338-PLAT_RADIUS_W) && hCount <= (338+PLAT_RADIUS_W)) && (vCount>=(20-PLAT_RADIUS_H+v_counter) && vCount<=(20+PLAT_RADIUS_H+v_counter));
+	assign B17 = (hCount >= (406-PLAT_RADIUS_W) && hCount <= (406+PLAT_RADIUS_W)) && (vCount>=(-220-PLAT_RADIUS_H+v_counter) && vCount<=(-288+PLAT_RADIUS_H+v_counter));
+	assign B18 = (hCount >= (632-PLAT_RADIUS_W) && hCount <= (632+PLAT_RADIUS_W)) && (vCount>=(-330-PLAT_RADIUS_H+v_counter) && vCount<=(-364+PLAT_RADIUS_H+v_counter));
+	assign B19 = (hCount >= (232-PLAT_RADIUS_W) && hCount <= (232+PLAT_RADIUS_W)) && (vCount>=(-444-PLAT_RADIUS_H+v_counter) && vCount<=(-444+PLAT_RADIUS_H+v_counter));
+	assign B20 = (hCount >= (600-PLAT_RADIUS_W) && hCount <= (600+PLAT_RADIUS_W)) && (vCount>=(-100-PLAT_RADIUS_H+v_counter) && vCount<=(-100+PLAT_RADIUS_H+v_counter));
+	/*
+	assign B21 = (hCount >= (500-PLAT_RADIUS_W) && hCount <= (500+PLAT_RADIUS_W)) && (vCount>=(-1675-PLAT_RADIUS_H+v_counter) && vCount<=(-1675+PLAT_RADIUS_H+v_counter));
+	assign B22 = (hCount >= (632-PLAT_RADIUS_W) && hCount <= (632+PLAT_RADIUS_W)) && (vCount>=(-500-PLAT_RADIUS_H+v_counter) && vCount<=(-500+PLAT_RADIUS_H+v_counter));
+	assign B23 = (hCount >= (182-PLAT_RADIUS_W) && hCount <= (182+PLAT_RADIUS_W)) && (vCount>=(-600-PLAT_RADIUS_H+v_counter) && vCount<=(-600+PLAT_RADIUS_H+v_counter));
+	assign B24 = (hCount >= (500-PLAT_RADIUS_W) && hCount <= (500+PLAT_RADIUS_W)) && (vCount>=(-710-PLAT_RADIUS_H+v_counter) && vCount<=(-710+PLAT_RADIUS_H+v_counter));
+	assign B25 = (hCount >= (288-PLAT_RADIUS_W) && hCount <= (288+PLAT_RADIUS_W)) && (vCount>=(-810-PLAT_RADIUS_H+v_counter) && vCount<=(-810+PLAT_RADIUS_H+v_counter));
+	assign B26 = (hCount >= (600-PLAT_RADIUS_W) && hCount <= (600+PLAT_RADIUS_W)) && (vCount>=(-900-PLAT_RADIUS_H+v_counter) && vCount<=(-900+PLAT_RADIUS_H+v_counter));
+	assign B27 = (hCount >= (338-PLAT_RADIUS_W) && hCount <= (338+PLAT_RADIUS_W)) && (vCount>=(-1010-PLAT_RADIUS_H+v_counter) && vCount<=(-1010 + PLAT_RADIUS_H+v_counter));
+	assign B28 = (hCount >= (406-PLAT_RADIUS_W) && hCount <= (406+PLAT_RADIUS_W)) && (vCount>=(-1110-PLAT_RADIUS_H+v_counter) && vCount<=(-1110+PLAT_RADIUS_H+v_counter));
+	assign B29 = (hCount >= (632-PLAT_RADIUS_W) && hCount <= (632+PLAT_RADIUS_W)) && (vCount>=(-1225-PLAT_RADIUS_H+v_counter) && vCount<=(-1225+PLAT_RADIUS_H+v_counter));
+	assign B30 = (hCount >= (232-PLAT_RADIUS_W) && hCount <= (232+PLAT_RADIUS_W)) && (vCount>=(-1335-PLAT_RADIUS_H+v_counter) && vCount<=(-1335+PLAT_RADIUS_H+v_counter));
+	assign B31 = (hCount >= (600-PLAT_RADIUS_W) && hCount <= (600+PLAT_RADIUS_W)) && (vCount>=(-1440-PLAT_RADIUS_H+v_counter) && vCount<=(-1440+PLAT_RADIUS_H+v_counter));
+	assign B32 = (hCount >= (500-PLAT_RADIUS_W) && hCount <= (500+PLAT_RADIUS_W)) && (vCount>=(-1560-PLAT_RADIUS_H+v_counter) && vCount<=(-1560+PLAT_RADIUS_H+v_counter));
+	*/
 	
 	// Assign temp vars to outputs
 	assign xpos = temp_x;

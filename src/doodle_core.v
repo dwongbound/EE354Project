@@ -59,6 +59,7 @@ module doodle_sm(
                             temp_score <= score + vert_speed;
 
                         if (object_y <= V_MIDDLE) begin
+
                             is_in_middle <= 1;
                             temp_v_counter <= v_counter + vert_speed;
                         end
@@ -101,6 +102,72 @@ module doodle_sm(
                         // B11
                         else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(80-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(80+PLAT_RADIUS_H+v_counter))
                             state <= UP;
+                        // B12
+                        else if ((object_x+DOODLE_RADIUS)>=(182-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(182+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(50-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(50+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B13
+                        else if ((object_x+DOODLE_RADIUS)>=(500-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(500+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(108-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(108+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B14
+                        else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-100-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-100+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B15
+                        else if ((object_x+DOODLE_RADIUS)>=(600-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(600+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(40-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(40+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B16
+                        else if ((object_x+DOODLE_RADIUS)>=(338-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(338+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(20-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(20+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B17
+                        else if ((object_x+DOODLE_RADIUS)>=(406-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(406+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-220-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-220+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B18
+                        else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-330-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-330+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B19
+                        else if ((object_x+DOODLE_RADIUS)>=(232-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(232+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-444-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-444+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B20
+                        else if ((object_x+DOODLE_RADIUS)>=(600-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(600+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-100-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-100+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        /*
+                        // B21
+                        else if ((object_x+DOODLE_RADIUS)>=(500-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(500+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-1675-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-1675+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B22
+                        else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-500-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-500+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B23
+                        else if ((object_x+DOODLE_RADIUS)>=(182-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(182+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-600-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-600+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B24
+                        else if ((object_x+DOODLE_RADIUS)>=(500-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(500+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-710-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-710+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B25
+                        else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-810-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-810+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B26
+                        else if ((object_x+DOODLE_RADIUS)>=(600-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(600+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-900-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-900+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B27
+                        else if ((object_x+DOODLE_RADIUS)>=(338-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(338+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-1010-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-1010+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B28
+                        else if ((object_x+DOODLE_RADIUS)>=(406-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(406+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-1110-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-1110+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B29
+                        else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-1225-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-1225+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B30
+                        else if ((object_x+DOODLE_RADIUS)>=(232-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(232+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-1335-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-1335+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B31
+                        else if ((object_x+DOODLE_RADIUS)>=(600-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(600+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-1440-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-1440+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        // B32
+                        else if ((object_x+DOODLE_RADIUS)>=(500-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(500+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(-1560-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(-1560+PLAT_RADIUS_H+v_counter))
+                            state <= UP;
+                        */
+                        
                     end
                 
                 DONE:

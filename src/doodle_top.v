@@ -87,7 +87,7 @@ module doodle_top(
 
 	// Related to doodle itself
 	reg[9:0] JUMP_HEIGHT = 127;
-	wire [9:0] xpos, ypos;
+	wire [15:0] xpos, ypos;
 	wire [9:0] up_count;
 	wire [15:0] v_counter; // keep track of screen scrolling as doodle jumps up
 	wire [3:0] vert_speed; // how many pixels doodle is moving per clock
