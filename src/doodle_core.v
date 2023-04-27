@@ -55,15 +55,15 @@ module doodle_sm(
                     begin
                         if (up_count >= JUMP_HEIGHT)
                             state <= DOWN;
-                        else
-                            temp_score <= score + vert_speed;
 
                         if (object_y <= V_MIDDLE) begin
                             is_in_middle <= 1;
                             temp_v_counter <= v_counter + vert_speed;
+                            temp_score <= vert_speed;
                         end
                         else 
                             is_in_middle <= 0;
+                        // Account for y shrinking
 
                     end
                 
