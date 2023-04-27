@@ -51,8 +51,6 @@ module doodle_top(
 	wire object_x, object_y;
 	wire is_in_middle;
 	wire [15:0] score;
-	wire [6:0] ssdOut;
-	wire [3:0] anode;
 	wire [11:0] rgb;
 
 	assign vgaR = rgb[11 : 8];
@@ -71,7 +69,6 @@ module doodle_top(
 	wire [3:0] SSD7, SSD6, SSD5, SSD4, SSD3, SSD2, SSD1, SSD0;
 	reg [7:0] SSD_CATHODES;
 	wire [6:0] row, col;
-	wire [11:0] color_data;
 
 	// disable mamory ports
 	assign {MemOE, MemWR, RamCS, QuadSpiFlashCS} = 4'b1111;
@@ -91,6 +88,7 @@ module doodle_top(
 	wire [9:0] up_count;
 	wire [15:0] v_counter; // keep track of screen scrolling as doodle jumps up
 	wire [3:0] vert_speed; // how many pixels doodle is moving per clock
+	wire [15:0] true_y; // True y position not taking into accound scroll
 
 	// Clock management
 	always @(posedge ClkPort, posedge Reset) 	
@@ -129,7 +127,8 @@ module doodle_top(
 		.is_in_middle(is_in_middle),
 		.vert_speed(vert_speed),
 		.v_counter(v_counter),
-		.score(score)
+		.score(score),
+		.true_y(true_y)
 	);
 
 	// Generates 4MHz clock for spi master
@@ -154,7 +153,8 @@ module doodle_top(
 		.up_count(up_count),
 		.vert_speed(vert_speed),
 		.JUMP_HEIGHT(JUMP_HEIGHT),
-		.is_in_middle(is_in_middle)
+		.is_in_middle(is_in_middle),
+		.true_y(true_y)
 	);
 
 	// Controls accelerometer data
@@ -201,14 +201,14 @@ module doodle_top(
 
 	// SSD Parameters
 	// SSDs go left to right, so SSD0 is on the left and SSD7 is on the right
-	assign SSD0 = ypos[15:12];
-	assign SSD1 = ypos[11:8];
-	assign SSD2 = ypos[7:4];
-	assign SSD3 = ypos[3:0];
-	assign SSD4 = score[15:12];
-	assign SSD5 = score[11:8];
-	assign SSS6 = score[7:4];
-	assign SSD7 = score[3:0];
+	assign SSD0 = v_counter[15:12];
+	assign SSD1 = v_counter[11:8];
+	assign SSD2 = v_counter[7:4];
+	assign SSD3 = v_counter[3:0];
+	assign SSD4 = true_y[15:12];
+	assign SSD5 = true_y[11:8];
+	assign SSD6 = true_y[7:4];
+	assign SSD7 = true_y[3:0];
 
 	assign ssdscan_clk = DIV_CLK[19:17];
 	assign An0	= !((ssdscan_clk[2]) && (ssdscan_clk[1]) && (ssdscan_clk[0]));  // when ssdscan_clk = 000

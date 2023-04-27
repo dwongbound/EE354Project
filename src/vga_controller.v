@@ -15,7 +15,8 @@ module vga_controller(
 	output [7:0] up_count,
 	output [3:0] vert_speed, // how many pixels it moves up or down per clock
 	input [9:0] JUMP_HEIGHT,
-	input is_in_middle
+	input is_in_middle,
+	output [15:0] true_y // the y location without scrolling effect
 );
 
     // Temp size of doodle's radius
@@ -33,6 +34,7 @@ module vga_controller(
 	reg [15:0] temp_x = 406, temp_y = 477;
 	reg [7:0] temp_up_count = 0; // To count how many pixels it went up
 	reg [3:0] temp_vert_speed = 0;
+	reg [15:0] temp_true_y = 477;
 
 	// Const color values
 	parameter BLACK = 12'b0000_0000_0000;
@@ -271,7 +273,7 @@ module vga_controller(
 
 	always@(posedge clk, posedge rst) 
 	begin
-		if (rst)
+		if (rst || q_I)
 		begin 
 			// rough values for above lowest block 
 			temp_x <= 406;
@@ -279,6 +281,7 @@ module vga_controller(
 			temp_up_count <= 0; // default
 			temp_vert_speed <= 0;
 			down_flag <= 0;
+			temp_true_y <= 477;
 		end
 		else if (clk) begin
 			// Update acceleration
@@ -317,13 +320,16 @@ module vga_controller(
 				if (is_in_middle == 0)
 					temp_y <= temp_y - vert_speed;
 				temp_up_count <= temp_up_count + vert_speed;
-				if (down_flag)
+				temp_true_y <= temp_true_y - vert_speed;
+				if (down_flag) begin
 					temp_up_count <= 0;
 					down_flag <= 0;
+				end
 			end
 			else if (q_Down) begin
 				down_flag <= 1;
 				temp_y <= temp_y + vert_speed;
+				temp_true_y <= temp_true_y + vert_speed;
 				temp_up_count <= temp_up_count - vert_speed;
 				if (temp_up_count <= 4) // next clock should be at least -4.
 					temp_up_count <= 0;
@@ -367,10 +373,10 @@ module vga_controller(
 			rgb = platform[vCount+PLAT_RADIUS_H-368-v_counter][hCount+PLAT_RADIUS_W-432];
 		else if (B11==1) // 632, 80
 			rgb = platform[vCount+PLAT_RADIUS_H-80-v_counter][hCount+PLAT_RADIUS_W-632];
-		else if (B12==1) // 180, 180
-			rgb = platform[vCount+PLAT_RADIUS_H-180-v_counter][hCount+PLAT_RADIUS_W-180];
-		else if (B13==1) // 444, 100
-			rgb = platform[vCount+PLAT_RADIUS_H-100-v_counter][hCount+PLAT_RADIUS_W-444];
+		else if (B12==1) // 180, 20
+			rgb = platform[vCount+PLAT_RADIUS_H-20-v_counter][hCount+PLAT_RADIUS_W-180];
+		else if (B13==1) // 444, 65530
+			rgb = platform[vCount+PLAT_RADIUS_H-65530-v_counter][hCount+PLAT_RADIUS_W-444];
 		// Doodle 
 		else if (block_fill)
 			if (last_direction == 1)
@@ -393,13 +399,14 @@ module vga_controller(
 	assign B9 = (hCount >= (338-PLAT_RADIUS_W) && hCount <= (338+PLAT_RADIUS_W)) && (vCount>=(308-PLAT_RADIUS_H+v_counter) && vCount<=(308+PLAT_RADIUS_H+v_counter));
 	assign B10 = (hCount >= (432-PLAT_RADIUS_W) && hCount <= (432+PLAT_RADIUS_W)) && (vCount>=(368-PLAT_RADIUS_H+v_counter) && vCount<=(368+PLAT_RADIUS_H+v_counter));
 	assign B11 = (hCount >= (632-PLAT_RADIUS_W) && hCount <= (632+PLAT_RADIUS_W)) && (vCount>=(80-PLAT_RADIUS_H+v_counter) && vCount<=(80+PLAT_RADIUS_H+v_counter));
-	assign B12 = (hCount >= (180-PLAT_RADIUS_W) && hCount <= (180+PLAT_RADIUS_W)) && (vCount>=(180-PLAT_RADIUS_H+v_counter) && vCount<=(180+PLAT_RADIUS_H+v_counter));
-	assign B13 = (hCount >= (444-PLAT_RADIUS_W) && hCount <= (444+PLAT_RADIUS_W)) && (vCount>=(100-PLAT_RADIUS_H+v_counter) && vCount<=(100+PLAT_RADIUS_H+v_counter));
+	assign B12 = (hCount >= (180-PLAT_RADIUS_W) && hCount <= (180+PLAT_RADIUS_W)) && (vCount>=(20-PLAT_RADIUS_H+v_counter) && vCount<=(20+PLAT_RADIUS_H+v_counter));
+	assign B13 = (hCount >= (444-PLAT_RADIUS_W) && hCount <= (444+PLAT_RADIUS_W)) && (vCount>=(65530-PLAT_RADIUS_H+v_counter) && vCount<=(65530+PLAT_RADIUS_H+v_counter));
 	
 	// Assign temp vars to outputs
 	assign xpos = temp_x;
 	assign ypos = temp_y;
 	assign up_count = temp_up_count;
 	assign vert_speed = temp_vert_speed;
-	
+	assign true_y = temp_true_y;
+
 endmodule

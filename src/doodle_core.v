@@ -12,7 +12,8 @@ module doodle_sm(
     output reg is_in_middle,
     output [15:0] v_counter, // How many pixels we've scrolled. Defaults to 0
     input [3:0] vert_speed,
-    output [15:0] score
+    output [15:0] score,
+    input [15:0] true_y
 );
     // State variables
     reg [3:0] state;
@@ -27,6 +28,7 @@ module doodle_sm(
     // Obtain the resolution of the screen using the VGA interface module
     parameter H_RES = 630; // Goes from 144 to 774 (right)
     parameter V_RES = 480; // Goes from 35 (top) to 515 (bottom)
+    reg [15:0] screen_bottom = 515; // The location of the bottom of the screen in relation to the vga world
 
     // Calculate the midpoint of the screen
     parameter H_MIDDLE = (H_RES / 2) + 144; // Includes offset
@@ -35,7 +37,6 @@ module doodle_sm(
     // Temp variables
     reg [9:0] temp_v_counter;
     reg [15:0] temp_score;
-    reg [9:0] current_fall; // How many pixels doodle has been falling used to move to done state.
 
     always @ (posedge Clk, posedge Reset)
     begin
@@ -51,11 +52,9 @@ module doodle_sm(
                     begin
                         if (Start)
                             state <= UP;
-                            current_fall <= 0;
                     end
                 UP:
                     begin
-                        current_fall <= 0;
                         if (up_count >= JUMP_HEIGHT)
                             state <= DOWN;
 
@@ -71,9 +70,8 @@ module doodle_sm(
                 
                 DOWN:
                     begin
-                        current_fall <= current_fall + vert_speed; // Keep track of how many pixels we've fallen
-                        if (current_fall >= V_RES) // If doodle has fallen one screen length, he's dead
-                                state <= DONE;
+                        if (((true_y[15] == v_counter[15]) && (true_y > 515 - v_counter))) // If doodle is below the bottom of the screen he's dead
+                            state <= DONE;
                         // B1
                         else if ((object_x+DOODLE_RADIUS)>=(288-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(288+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(208-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(208+PLAT_RADIUS_H+v_counter))
                             state <= UP;
@@ -105,10 +103,10 @@ module doodle_sm(
                         else if ((object_x+DOODLE_RADIUS)>=(632-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(632+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(80-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(80+PLAT_RADIUS_H+v_counter))
                             state <= UP;
                         // B12
-                        else if ((object_x+DOODLE_RADIUS)>=(180-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(180+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(180-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(180+PLAT_RADIUS_H+v_counter)) // 180, 180
+                        else if ((object_x+DOODLE_RADIUS)>=(180-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(180+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(20-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(20+PLAT_RADIUS_H+v_counter)) // 180, 20
                             state <= UP;
                         // B13
-                        else if ((object_x+DOODLE_RADIUS)>=(444-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(444+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(100-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(100+PLAT_RADIUS_H+v_counter)) // 444, 100
+                        else if ((object_x+DOODLE_RADIUS)>=(444-PLAT_RADIUS_W) && (object_x-DOODLE_RADIUS)<=(444+PLAT_RADIUS_W) && (object_y+DOODLE_RADIUS)>=(65530-PLAT_RADIUS_H+v_counter) && (object_y+DOODLE_RADIUS)<=(65530+PLAT_RADIUS_H+v_counter)) // 444, 65530
                             state <= UP;
                     end
                 
